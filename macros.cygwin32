@@ -1,0 +1,180 @@
+# RPM macros for Fedora Cygwin.
+
+%cygwin32_pkg_name        %(echo %{name} | sed 's/^cygwin-/cygwin32-/')
+%cygwin32_target          i686-pc-cygwin
+
+# Paths.
+%cygwin32_sysroot         %{_prefix}/%{cygwin32_target}/sys-root
+%cygwin32_prefix          %{cygwin32_sysroot}/usr
+%cygwin32_exec_prefix     %{cygwin32_prefix}
+%cygwin32_bindir          %{cygwin32_exec_prefix}/bin
+%cygwin32_sbindir         %{cygwin32_exec_prefix}/sbin
+%cygwin32_libexecdir      %{cygwin32_exec_prefix}/lib
+%cygwin32_libdir          %{cygwin32_exec_prefix}/lib
+%cygwin32_datadir         %{cygwin32_prefix}/share
+%cygwin32_docdir          %{cygwin32_prefix}/share/doc
+%cygwin32_infodir         %{cygwin32_prefix}/share/info
+%cygwin32_mandir          %{cygwin32_prefix}/share/man
+%cygwin32_sysconfdir      %{cygwin32_sysroot}/etc
+%cygwin32_sharedstatedir  %{cygwin32_sysroot}/srv
+%cygwin32_localstatedir   %{cygwin32_sysroot}/var
+%cygwin32_includedir      %{cygwin32_prefix}/include
+
+# Build macros.
+%cygwin32_host            %{cygwin32_target}
+
+%cygwin32_cflags          %{cygwin32_cppflags} -O2 -g -pipe -Wall
+%cygwin32_cppflags        %{nil}
+%cygwin32_ldflags         %{nil}
+
+%cygwin32_cc              %{cygwin32_target}-gcc
+%cygwin32_cxx             %{cygwin32_target}-g++
+%cygwin32_cpp             %{cygwin32_target}-gcc -E
+%cygwin32_addr2line       %{cygwin32_target}-addr2line
+%cygwin32_ar              %{cygwin32_target}-ar
+%cygwin32_as              %{cygwin32_target}-as
+%cygwin32_cxxfilt         %{cygwin32_target}-c++filt
+%cygwin32_dlltool         %{cygwin32_target}-dlltool
+%cygwin32_dllwrap         %{cygwin32_target}-dllwrap
+%cygwin32_gcov            %{cygwin32_target}-gcov
+%cygwin32_gprof           %{cygwin32_target}-gprof
+%cygwin32_ld              %{cygwin32_target}-ld
+%cygwin32_nm              %{cygwin32_target}-nm
+%cygwin32_objcopy         %{cygwin32_target}-objcopy
+%cygwin32_objdump         %{cygwin32_target}-objdump
+%cygwin32_ranlib          %{cygwin32_target}-ranlib
+%cygwin32_readelf         %{cygwin32_target}-readelf
+%cygwin32_size            %{cygwin32_target}-size
+%cygwin32_strings         %{cygwin32_target}-strings
+%cygwin32_strip           %{cygwin32_target}-strip
+%cygwin32_windmc          %{cygwin32_target}-windmc
+%cygwin32_windres         %{cygwin32_target}-windres
+
+%cygwin32_qmake           %{cygwin32_target}-qmake
+%cygwin32_moc             %{cygwin32_target}-moc
+%cygwin32_rcc             %{cygwin32_target}-rcc
+%cygwin32_uic             %{cygwin32_target}-uic
+%cygwin32_uic3            %{cygwin32_target}-uic3
+%cygwin32_lrelease        %{cygwin32_target}-lrelease
+%cygwin32_lupdate         %{cygwin32_target}-lupdate
+%cygwin32_qdbuscpp2xml    %{cygwin32_target}-qdbuscpp2xml
+%cygwin32_qdbusxml2cpp    %{cygwin32_target}-qdbusxml2cpp
+
+%cygwin32_cache           cygwin32-config.cache
+
+# Template for debug sub-package.
+%cygwin32_debug_package \
+%package -n %{cygwin32_pkg_name}-debuginfo \
+Summary: Debug information for package %{name} \
+Group: Development/Debug \
+%description -n %{cygwin32_pkg_name}-debuginfo \
+This package provides debug information for package %{name}. \
+Debug information is useful when developing applications that use this \
+package or when debugging this package. \
+%files -n %{cygwin32_pkg_name}-debuginfo -f cygwin32-debugfiles.list \
+%defattr(-,root,root,-) \
+%{nil}
+
+
+%cygwin32_env HOST_CC=gcc; export HOST_CC; \
+  PKG_CONFIG_LIBDIR="%{cygwin32_libdir}/pkgconfig:%{cygwin32_datadir}/pkgconfig:%{_datadir}/pkgconfig"; \
+  export PKG_CONFIG_LIBDIR; \
+  PKG_CONFIG_SYSTEM_INCLUDE_PATH="%{cygwin32_includedir}"; \
+  export PKG_CONFIG_SYSTEM_INCLUDE_PATH; \
+  PKG_CONFIG_SYSTEM_LIBRARY_PATH="%{cygwin32_libdir}"; \
+  export PKG_CONFIG_SYSTEM_LIBRARY_PATH; \
+  unset PKG_CONFIG_PATH; \
+  _PREFIX="%{_bindir}/%{cygwin32_target}-"; \
+  for i in `ls -1 ${_PREFIX}* | grep -v 'gcc-'`; do \
+    x=`echo $i|sed "s,${_PREFIX},,"|tr "a-z+-\." "A-ZX__"`; \
+    declare -x $x="$i" ; export $x; \
+  done; \
+  unset _PREFIX; \
+  CC="${CYGWIN32_CC:-%cygwin32_cc}"; export CC; \
+  CFLAGS="${CYGWIN32_CFLAGS-%cygwin32_cflags}"; export CFLAGS; \
+  CPPFLAGS="${CYGWIN32_CPPFLAGS-%cygwin32_cppflags}"; export CPPFLAGS; \
+  if [ -x "%{_bindir}/%{cygwin32_cxx}" ]; then \
+    CXX="${CYGWIN32_CXX:-%cygwin32_cxx}"; export CXX; \
+    CXXFLAGS="${CYGWIN32_CXXFLAGS-%cygwin32_cflags}"; export CXXFLAGS; \
+  else \
+    CXX=; export CXX; \
+    ac_cv_prog_CXX=no; export ac_cv_prog_CXX; \
+    CXXFLAGS=; export CXXFLAGS; \
+  fi; \
+  LDFLAGS="${CYGWIN32_LDFLAGS:-%cygwin32_ldflags}"; export LDFLAGS; \
+  for i in `ls %{_bindir}/*|grep -- "[-_]config\$"` ; do \
+    case $i in *pkg-config) continue ; esac ; \
+    x=`basename $i|tr "a-z+-\." "A-ZX__"`; \
+    declare -x $x="no" ; export $x; \
+    declare -x ac_cv_path_$x="no" ; export ac_cv_path_$x; \
+  done; \
+  for i in `ls %{cygwin32_bindir}/*|grep -- "[-_]config\$"` ; do \
+    x=`basename $i|tr "a-z+-\." "A-ZX__"`; \
+    declare -x $x="$i" ; export $x; \
+    declare -x ac_cv_path_$x="$i" ; export ac_cv_path_$x; \
+  done; \
+  unset x i
+
+%cygwin32_pkg_config %{cygwin32_target}-pkg-config
+
+%cygwin32_autoreconf %{cygwin_autoreconf}
+
+%cygwin32_configure %{cygwin32_env} ; \
+  unset PKG_CONFIG_LIBDIR PKG_CONFIG_SYSTEM_INCLUDE_PATH PKG_CONFIG_SYSTEM_LIBRARY_PATH; \\\
+  _cygwin32_topdir=.; if ! test -x configure; then _cygwin32_topdir=..; fi; \\\
+  $_cygwin32_topdir/configure --cache-file=%{cygwin32_cache} \\\
+	--host=%{cygwin32_host} \\\
+	--build=%_build \\\
+	--target=%{cygwin32_target} \\\
+	--prefix=%{cygwin32_prefix} \\\
+	--exec-prefix=%{cygwin32_exec_prefix} \\\
+	--bindir=%{cygwin32_bindir} \\\
+	--sbindir=%{cygwin32_sbindir} \\\
+	--sysconfdir=%{cygwin32_sysconfdir} \\\
+	--datadir=%{cygwin32_datadir} \\\
+	--includedir=%{cygwin32_includedir} \\\
+	--libdir=%{cygwin32_libdir} \\\
+	--libexecdir=%{cygwin32_libexecdir} \\\
+	--localstatedir=%{cygwin32_localstatedir} \\\
+	--sharedstatedir=%{cygwin32_sharedstatedir} \\\
+	--mandir=%{cygwin32_mandir} \\\
+	--infodir=%{cygwin32_infodir} \\\
+	${CYGWIN_CONFIGURE_ARGS} \\\
+	${CYGWIN32_CONFIGURE_ARGS}
+
+%cygwin32_make %{cygwin32_env} ; \
+  make \\\
+	prefix=%{cygwin32_prefix} \\\
+	exec_prefix=%{cygwin32_exec_prefix} \\\
+	bindir=%{cygwin32_bindir} \\\
+	sbindir=%{cygwin32_sbindir} \\\
+	sysconfdir=%{cygwin32_sysconfdir} \\\
+	datadir=%{cygwin32_datadir} \\\
+	includedir=%{cygwin32_includedir} \\\
+	libdir=%{cygwin32_libdir} \\\
+	libexecdir=%{cygwin32_libexecdir} \\\
+	localstatedir=%{cygwin32_localstatedir} \\\
+	sharedstatedir=%{cygwin32_sharedstatedir} \\\
+	mandir=%{cygwin32_mandir} \\\
+	infodir=%{cygwin32_infodir}
+
+%cygwin32_cmake %{cygwin32_env} ; \
+  if test "${CYGWIN_CMAKE_NO_VERBOSE}" == ""; then \\\
+      CYGWIN32_CMAKE_ARGS="${CYGWIN32_CMAKE_ARGS} -DCMAKE_VERBOSE_MAKEFILE=ON" ; \\\
+  fi ; \\\
+  %__cmake \\\
+        -Wno-dev \\\
+        -DCMAKE_INSTALL_PREFIX:PATH=%{cygwin32_prefix} \\\
+        -DCMAKE_INSTALL_LIBDIR:PATH=%{cygwin32_libdir} \\\
+        -DINCLUDE_INSTALL_DIR:PATH=%{cygwin32_includedir} \\\
+        -DSYSCONF_INSTALL_DIR:PATH=%{cygwin32_sysconfdir} \\\
+        -DSHARE_INSTALL_PREFIX:PATH=%{cygwin32_datadir} \\\
+        %{?_cmake_skip_rpath} \\\
+        -DBUILD_SHARED_LIBS:BOOL=ON \\\
+        -DCMAKE_TOOLCHAIN_FILE=/usr/share/cygwin/toolchain-cygwin32.cmake \\\
+	${CYGWIN_CMAKE_ARGS} \\\
+	${CYGWIN32_CMAKE_ARGS}
+
+%cygwin32_description This is the cross-compiled version of this library / tool.\
+You should only install this package if you want to cross-compile programs for \
+Cygwin i686.

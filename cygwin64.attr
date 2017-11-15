@@ -1,0 +1,3 @@
+%__cygwin64_provides	%{_rpmconfigdir}/cygwin-find-provides.sh cygwin64
+%__cygwin64_requires	%{_rpmconfigdir}/cygwin-find-requires.sh cygwin64
+%__cygwin64_path	^%{cygwin64_prefix}/.*\.([Dd][Ll][Ll]|[Ee][Xx][Ee])$

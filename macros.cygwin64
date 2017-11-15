@@ -1,0 +1,198 @@
+# RPM macros for Fedora Cygwin.
+
+%cygwin64_pkg_name        %(echo %{name} | sed 's/^cygwin-/cygwin64-/')
+%cygwin64_target          x86_64-pc-cygwin
+
+# Paths.
+%cygwin64_sysroot         %{_prefix}/%{cygwin64_target}/sys-root
+%cygwin64_prefix          %{cygwin64_sysroot}/usr
+%cygwin64_exec_prefix     %{cygwin64_prefix}
+%cygwin64_bindir          %{cygwin64_exec_prefix}/bin
+%cygwin64_sbindir         %{cygwin64_exec_prefix}/sbin
+%cygwin64_libexecdir      %{cygwin64_exec_prefix}/libexec
+%cygwin64_libdir          %{cygwin64_exec_prefix}/lib
+%cygwin64_datadir         %{cygwin64_prefix}/share
+%cygwin64_docdir          %{cygwin64_prefix}/share/doc
+%cygwin64_infodir         %{cygwin64_prefix}/share/info
+%cygwin64_mandir          %{cygwin64_prefix}/share/man
+%cygwin64_sysconfdir      %{cygwin64_sysroot}/etc
+%cygwin64_sharedstatedir  %{cygwin64_sysroot}/srv
+%cygwin64_localstatedir   %{cygwin64_sysroot}/var
+%cygwin64_includedir      %{cygwin64_prefix}/include
+
+# Build macros.
+%cygwin64_host            %{cygwin64_target}
+
+%cygwin64_cflags          %{cygwin64_cppflags} -O2 -g -pipe -Wall
+%cygwin64_cppflags        %{nil}
+%cygwin64_ldflags         %{nil}
+
+%cygwin64_cc              %{cygwin64_target}-gcc
+%cygwin64_cxx             %{cygwin64_target}-g++
+%cygwin64_cpp             %{cygwin64_target}-gcc -E
+%cygwin64_addr2line       %{cygwin64_target}-addr2line
+%cygwin64_ar              %{cygwin64_target}-ar
+%cygwin64_as              %{cygwin64_target}-as
+%cygwin64_cxxfilt         %{cygwin64_target}-c++filt
+%cygwin64_dlltool         %{cygwin64_target}-dlltool
+%cygwin64_dllwrap         %{cygwin64_target}-dllwrap
+%cygwin64_gcov            %{cygwin64_target}-gcov
+%cygwin64_gprof           %{cygwin64_target}-gprof
+%cygwin64_ld              %{cygwin64_target}-ld
+%cygwin64_nm              %{cygwin64_target}-nm
+%cygwin64_objcopy         %{cygwin64_target}-objcopy
+%cygwin64_objdump         %{cygwin64_target}-objdump
+%cygwin64_ranlib          %{cygwin64_target}-ranlib
+%cygwin64_readelf         %{cygwin64_target}-readelf
+%cygwin64_size            %{cygwin64_target}-size
+%cygwin64_strings         %{cygwin64_target}-strings
+%cygwin64_strip           %{cygwin64_target}-strip
+%cygwin64_windmc          %{cygwin64_target}-windmc
+%cygwin64_windres         %{cygwin64_target}-windres
+
+%cygwin64_qmake           %{cygwin64_target}-qmake
+%cygwin64_moc             %{cygwin64_target}-moc
+%cygwin64_rcc             %{cygwin64_target}-rcc
+%cygwin64_uic             %{cygwin64_target}-uic
+%cygwin64_uic3            %{cygwin64_target}-uic3
+%cygwin64_lrelease        %{cygwin64_target}-lrelease
+%cygwin64_lupdate         %{cygwin64_target}-lupdate
+%cygwin64_qdbuscpp2xml    %{cygwin64_target}-qdbuscpp2xml
+%cygwin64_qdbusxml2cpp    %{cygwin64_target}-qdbusxml2cpp
+
+%cygwin64_cache           cygwin64-config.cache
+
+
+# Template for debug sub-package.
+%cygwin64_debug_package \
+%package -n %{cygwin64_pkg_name}-debuginfo \
+Summary: Debug information for package %{name} \
+Group: Development/Debug \
+%description -n %{cygwin64_pkg_name}-debuginfo \
+This package provides debug information for package %{name}. \
+Debug information is useful when developing applications that use this \
+package or when debugging this package. \
+%files -n %{cygwin64_pkg_name}-debuginfo -f cygwin64-debugfiles.list \
+%defattr(-,root,root,-) \
+%{nil}
+
+
+%cygwin64_env HOST_CC=gcc; export HOST_CC; \
+  PKG_CONFIG_LIBDIR="%{cygwin64_libdir}/pkgconfig:%{cygwin64_datadir}/pkgconfig:%{_datadir}/pkgconfig"; \
+  export PKG_CONFIG_LIBDIR; \
+  PKG_CONFIG_SYSTEM_INCLUDE_PATH="%{cygwin64_includedir}"; \
+  export PKG_CONFIG_SYSTEM_INCLUDE_PATH; \
+  PKG_CONFIG_SYSTEM_LIBRARY_PATH="%{cygwin64_libdir}"; \
+  export PKG_CONFIG_SYSTEM_LIBRARY_PATH; \
+  unset PKG_CONFIG_PATH; \
+  _PREFIX="%{_bindir}/%{cygwin64_target}-"; \
+  for i in `ls -1 ${_PREFIX}* | grep -v 'gcc-'`; do \
+    x=`echo $i|sed "s,${_PREFIX},,"|tr "a-z+-\." "A-ZX__"`; \
+    declare -x $x="$i" ; export $x; \
+  done; \
+  unset _PREFIX; \
+  CC="${CYGWIN64_CC:-%cygwin64_cc}"; export CC; \
+  CFLAGS="${CYGWIN64_CFLAGS-%cygwin64_cflags}"; export CFLAGS; \
+  CPPFLAGS="${CYGWIN64_CPPFLAGS-%cygwin64_cppflags}"; export CPPFLAGS; \
+  if [ -x "%{_bindir}/%{cygwin64_cxx}" ]; then \
+    CXX="${CYGWIN64_CXX:-%cygwin64_cxx}"; export CXX; \
+    CXXFLAGS="${CYGWIN64_CXXFLAGS-%cygwin64_cflags}"; export CXXFLAGS; \
+  else \
+    CXX=; export CXX; \
+    ac_cv_prog_CXX=no; export ac_cv_prog_CXX; \
+    CXXFLAGS=; export CXXFLAGS; \
+  fi; \
+  LDFLAGS="${CYGWIN64_LDFLAGS:-%cygwin64_ldflags}"; export LDFLAGS; \
+  for i in `ls %{_bindir}/*|grep -- "[-_]config\$"` ; do \
+    case $i in *pkg-config) continue ; esac ; \
+    x=`basename $i|tr "a-z+-\." "A-ZX__"`; \
+    declare -x $x="no" ; export $x; \
+    declare -x ac_cv_path_$x="no" ; export ac_cv_path_$x; \
+  done; \
+  for i in `ls %{cygwin64_bindir}/*|grep -- "[-_]config\$"` ; do \
+    x=`basename $i|tr "a-z+-\." "A-ZX__"`; \
+    declare -x $x="$i" ; export $x; \
+    declare -x ac_cv_path_$x="$i" ; export ac_cv_path_$x; \
+  done; \
+  unset x i
+
+%cygwin64_pkg_config %{cygwin64_target}-pkg-config
+
+%cygwin64_autoreconf %{cygwin_autoreconf}
+
+%cygwin64_configure %{cygwin64_env} ; \
+  unset PKG_CONFIG_LIBDIR PKG_CONFIG_SYSTEM_INCLUDE_PATH PKG_CONFIG_SYSTEM_LIBRARY_PATH; \\\
+  _cygwin64_topdir=.; if ! test -x configure; then _cygwin64_topdir=..; fi; \\\
+  $_cygwin64_topdir/configure --cache-file=%{cygwin64_cache} \\\
+	--host=%{cygwin64_host} \\\
+	--build=%_build \\\
+	--target=%{cygwin64_target} \\\
+	--prefix=%{cygwin64_prefix} \\\
+	--exec-prefix=%{cygwin64_exec_prefix} \\\
+	--bindir=%{cygwin64_bindir} \\\
+	--sbindir=%{cygwin64_sbindir} \\\
+	--sysconfdir=%{cygwin64_sysconfdir} \\\
+	--datadir=%{cygwin64_datadir} \\\
+	--includedir=%{cygwin64_includedir} \\\
+	--libdir=%{cygwin64_libdir} \\\
+	--libexecdir=%{cygwin64_libexecdir} \\\
+	--localstatedir=%{cygwin64_localstatedir} \\\
+	--sharedstatedir=%{cygwin64_sharedstatedir} \\\
+	--mandir=%{cygwin64_mandir} \\\
+	--infodir=%{cygwin64_infodir} \\\
+	${CYGWIN_CONFIGURE_ARGS} \\\
+	${CYGWIN64_CONFIGURE_ARGS}
+
+%cygwin64_make %{cygwin64_env} ; \
+  make \\\
+	prefix=%{cygwin64_prefix} \\\
+	exec_prefix=%{cygwin64_exec_prefix} \\\
+	bindir=%{cygwin64_bindir} \\\
+	sbindir=%{cygwin64_sbindir} \\\
+	sysconfdir=%{cygwin64_sysconfdir} \\\
+	datadir=%{cygwin64_datadir} \\\
+	includedir=%{cygwin64_includedir} \\\
+	libdir=%{cygwin64_libdir} \\\
+	libexecdir=%{cygwin64_libexecdir} \\\
+	localstatedir=%{cygwin64_localstatedir} \\\
+	sharedstatedir=%{cygwin64_sharedstatedir} \\\
+	mandir=%{cygwin64_mandir} \\\
+	infodir=%{cygwin64_infodir}
+
+%cygwin64_makeinstall %{cygwin64_env} ; \
+  make \\\
+	prefix=%{?buildroot:%{buildroot}}%{cygwin64_prefix} \\\
+	exec_prefix=%{?buildroot:%{buildroot}}%{cygwin64_exec_prefix} \\\
+	bindir=%{?buildroot:%{buildroot}}%{cygwin64_bindir} \\\
+	sbindir=%{?buildroot:%{buildroot}}%{cygwin64_sbindir} \\\
+	sysconfdir=%{?buildroot:%{buildroot}}%{cygwin64_sysconfdir} \\\
+	datadir=%{?buildroot:%{buildroot}}%{cygwin64_datadir} \\\
+	includedir=%{?buildroot:%{buildroot}}%{cygwin64_includedir} \\\
+	libdir=%{?buildroot:%{buildroot}}%{cygwin64_libdir} \\\
+	libexecdir=%{?buildroot:%{buildroot}}%{cygwin64_libexecdir} \\\
+	localstatedir=%{?buildroot:%{buildroot}}%{cygwin64_localstatedir} \\\
+	sharedstatedir=%{?buildroot:%{buildroot}}%{cygwin64_sharedstatedir} \\\
+	mandir=%{?buildroot:%{buildroot}}%{cygwin64_mandir} \\\
+	infodir=%{?buildroot:%{buildroot}}%{cygwin64_infodir} \\\
+  install
+
+%cygwin64_cmake %{cygwin64_env} ; \
+  if test "${CYGWIN_CMAKE_NO_VERBOSE}" == ""; then \\\
+      CYGWIN64_CMAKE_ARGS="${CYGWIN64_CMAKE_ARGS} -DCMAKE_VERBOSE_MAKEFILE=ON" ; \\\
+  fi ; \\\
+  %__cmake \\\
+        -Wno-dev \\\
+        -DCMAKE_INSTALL_PREFIX:PATH=%{cygwin64_prefix} \\\
+        -DCMAKE_INSTALL_LIBDIR:PATH=%{cygwin64_libdir} \\\
+        -DINCLUDE_INSTALL_DIR:PATH=%{cygwin64_includedir} \\\
+        -DSYSCONF_INSTALL_DIR:PATH=%{cygwin64_sysconfdir} \\\
+        -DSHARE_INSTALL_PREFIX:PATH=%{cygwin64_datadir} \\\
+        %{?_cmake_skip_rpath} \\\
+        -DBUILD_SHARED_LIBS:BOOL=ON \\\
+        -DCMAKE_TOOLCHAIN_FILE=/usr/share/cygwin/toolchain-cygwin64.cmake \\\
+	${CYGWIN_CMAKE_ARGS} \\\
+	${CYGWIN64_CMAKE_ARGS}
+
+%cygwin64_description This is the cross-compiled version of this library / tool.\
+You should only install this package if you want to cross-compile programs for \
+Cygwin x86_64.
