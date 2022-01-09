@@ -59,8 +59,10 @@ environment for all Fedora Cygwin packages.
 Summary:        Generic files which are needed for both cygwin32-filesystem and cygwin64-filesystem
 
 Requires:       redhat-rpm-config
+%if 0%{?fedora} || 0%{?rhel} >= 9
 # For using pkgconf with Cygwin
 Requires:       pkgconf
+%endif
 
 %description base
 This package contains the base filesystem layout, RPM macros and
