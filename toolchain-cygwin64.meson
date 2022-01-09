@@ -1,0 +1,21 @@
+[binaries]
+c = 'x86_64-pc-cygwin-gcc'
+cpp = 'x86_64-pc-cygwin-g++'
+fortran = 'x86_64-pc-cygwin-gfortran'
+ar = '/usr/bin/x86_64-pc-cygwin-ar'
+pkgconfig = '/usr/bin/x86_64-pc-cygwin-pkg-config'
+ranlib = '/usr/bin/x86_64-pc-cygwin-ranlib'
+strip = '/usr/bin/x86_64-pc-cygwin-strip'
+windres = '/usr/bin/x86_64-pc-cygwin-windres'
+dlltool = '/usr/bin/x86_64-pc-cygwin-dlltool'
+libgcrypt-config = '/usr/x86_64-pc-cygwin/sys-root/usr/bin/libgcrypt-config'
+
+[properties]
+root = '/usr/x86_64-pc-cygwin/sys-root/usr'
+needs_exe_wrapper = true
+
+[host_machine]
+system = 'cygwin'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'

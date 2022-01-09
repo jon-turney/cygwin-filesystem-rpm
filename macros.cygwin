@@ -1,4 +1,4 @@
-# RPM macros for the Fedora MinGW Cross Compiler collection
+# RPM macros for the Fedora Cygwin Cross Compiler collection
 
 %cygwin_build_targets        cygwin32 cygwin64
 %cygwin_build_32bit          1
@@ -9,35 +9,30 @@
 %cygwin_objcopy              cygwin-objcopy
 %cygwin_nm                   cygwin-nm
 
-%cygwin_findprovides         %{_rpmconfigdir}/cygwin-find-provides.sh %{cygwin_build_targets}
-%cygwin_findrequires         %{_rpmconfigdir}/cygwin-find-requires.sh %{cygwin_build_targets}
 %cygwin_finddebuginfo        %{_rpmconfigdir}/cygwin-find-debuginfo.sh
 
 %cygwin_find_lang            %{_rpmconfigdir}/cygwin-find-lang.sh %{buildroot}
 
 %cygwin_debug_install_post   %{cygwin_finddebuginfo} %{_builddir}/%{?buildsubdir} %{cygwin_build_targets}
 
-%cygwin_debug_package              \
-%if 0%{?cygwin_build_32bit} == 1   \
-%{?cygwin32_debug_package}         \
+%cygwin_debug_package               \
+%if 0%{?cygwin_build_32bit} == 1    \
+%{?cygwin32_debug_package}          \
 %endif                             \
-%if 0%{?cygwin_build_64bit} == 1   \
-%{?cygwin64_debug_package}         \
+%if 0%{?cygwin_build_64bit} == 1    \
+%{?cygwin64_debug_package}          \
 %endif                             \
 %{nil}
 
-%cygwin_package_header                                        \
-%global __strip %{cygwin_strip}                               \
-%global __objdump %{cygwin_objdump}                           \
-%if 0%{?rhel} == 6                                            \
-%global _use_internal_dependency_generator 0                  \
-%global __find_requires %{cygwin_findrequires}                \
-%global __find_provides %{cygwin_findprovides}                \
-%endif                                                        \
-%global __debug_install_post %%{cygwin_debug_install_post}    \
+%cygwin_package_header                                         \
+%global __strip %{cygwin_strip}                                \
+%global __objdump %{cygwin_objdump}                            \
+%global __debug_install_post %%{cygwin_debug_install_post}     \
 %{nil}
 
 %cygwin_autoreconf \
+run_cygwin_autoreconf() \
+{ \
   if [ -x %{_bindir}/cygwin-libtoolize ]; then \
     LIBTOOLIZE=%{_bindir}/cygwin-libtoolize; export LIBTOOLIZE; \
     ACLOCAL_FLAGS="-I %{_datadir}/cygwin-libtool/m4"; \
@@ -53,94 +48,157 @@
     eval gettext_`grep '^version=' %{cygwin32_bindir}/autopoint`; \
     AUTOPOINT="%{cygwin32_bindir}/autopoint -V $gettext_version" ; export AUTOPOINT; \
   fi; \
-  autoreconf -fiv
+  autoreconf -fiv \
+} \
+run_cygwin_autoreconf
 
-%cygwin_configure                                      \
-run_cygwin_configure()                                 \
+%cygwin_configure                                       \
+run_cygwin_configure()                                  \
 {                                                      \
 [ "%_configure_gnuconfig_hack" = 1 ] && for i in $(find . -name config.guess -o -name config.sub) ; do \
     [ -f /usr/lib/rpm/redhat/$(basename $i) ] && %{__rm} -f $i && %{__cp} -fv /usr/lib/rpm/redhat/$(basename $i) $i ; \
 done ; \
-%if 0%{?cygwin_build_32bit} == 1                       \
-mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX               \
-pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX               \
-    %{?cygwin32_configure} "$@"                        \
+%if 0%{?cygwin_build_32bit} == 1                        \
+mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin32_configure} "$@"                         \
 popd                                                   \
 %endif                                                 \
-%if 0%{?cygwin_build_64bit} == 1                       \
-mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX               \
-pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX               \
-    %{?cygwin64_configure} "$@"                        \
+%if 0%{?cygwin_build_64bit} == 1                        \
+mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin64_configure} "$@"                         \
 popd                                                   \
 %endif                                                 \
 }                                                      \
 run_cygwin_configure
 
-%cygwin_make                                                        \
-run_cygwin_make()                                                   \
+%cygwin_make                                                         \
+run_cygwin_make()                                                    \
 {                                                                   \
-%if 0%{?cygwin_build_32bit} == 1                                    \
-make -C build_32bit$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN32_MAKE_ARGS \
+%if 0%{?cygwin_build_32bit} == 1                                     \
+%{__make} -C build_32bit$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN32_MAKE_ARGS   \
 %endif                                                              \
-%if 0%{?cygwin_build_64bit} == 1                                    \
-make -C build_64bit$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN64_MAKE_ARGS \
+%if 0%{?cygwin_build_64bit} == 1                                     \
+%{__make} -C build_64bit$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN64_MAKE_ARGS   \
 %endif                                                              \
 }                                                                   \
 run_cygwin_make
 
-%cygwin_cmake                                          \
-run_cygwin_cmake()                                     \
+%cygwin_cmake                                           \
+run_cygwin_cmake()                                      \
 {                                                      \
-%if 0%{?cygwin_build_32bit} == 1                       \
-mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX               \
-pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX               \
-    %{?cygwin32_cmake "$@"}                            \
+%if 0%{?cygwin_build_32bit} == 1                        \
+mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin32_cmake "$@"}                             \
 popd                                                   \
 %endif                                                 \
-%if 0%{?cygwin_build_64bit} == 1                       \
-mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX               \
-pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX               \
-    %{?cygwin64_cmake "$@"}                            \
+%if 0%{?cygwin_build_64bit} == 1                        \
+mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin64_cmake "$@"}                             \
 popd                                                   \
 %endif                                                 \
 }                                                      \
 run_cygwin_cmake
 
-%cygwin_cmake_kde4                                     \
-run_cygwin_cmake_kde4()                                \
+%cygwin_cmake_kde4                                      \
+run_cygwin_cmake_kde4()                                 \
 {                                                      \
-%if 0%{?cygwin_build_32bit} == 1                       \
-mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX               \
-pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX               \
-    %{?cygwin32_cmake_kde4 "$@"}                       \
+%if 0%{?cygwin_build_32bit} == 1                        \
+mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin32_cmake_kde4 "$@"}                        \
 popd                                                   \
 %endif                                                 \
-%if 0%{?cygwin_build_64bit} == 1                       \
-mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX               \
-pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX               \
-    %{?cygwin64_cmake_kde4 "$@"}                       \
+%if 0%{?cygwin_build_64bit} == 1                        \
+mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin64_cmake_kde4 "$@"}                        \
 popd                                                   \
 %endif                                                 \
 }                                                      \
 run_cygwin_cmake_kde4
 
-%cygwin_qmake_qt4                                      \
-run_cygwin_qmake_qt4()                                 \
+%cygwin_qmake_qt4                                       \
+run_cygwin_qmake_qt4()                                  \
 {                                                      \
-%if 0%{?cygwin_build_32bit} == 1                       \
-mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX               \
-pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX               \
-    %{?cygwin32_qmake_qt4} "$@"                        \
+%if 0%{?cygwin_build_32bit} == 1                        \
+mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin32_qmake_qt4} "$@"                         \
 popd                                                   \
 %endif                                                 \
-%if 0%{?cygwin_build_64bit} == 1                       \
-mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX               \
-pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX               \
-    %{?cygwin64_qmake_qt4} "$@"                        \
+%if 0%{?cygwin_build_64bit} == 1                        \
+mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin64_qmake_qt4} "$@"                         \
 popd                                                   \
 %endif                                                 \
 }                                                      \
 run_cygwin_qmake_qt4
 
-# Deprecated:
-%cygwin_make_install         %cygwin_make install
+%cygwin_qmake_qt5                                       \
+run_cygwin_qmake_qt5()                                  \
+{                                                      \
+%if 0%{?cygwin_build_32bit} == 1                        \
+mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin32_qmake_qt5} "$@"                         \
+popd                                                   \
+%endif                                                 \
+%if 0%{?cygwin_build_64bit} == 1                        \
+mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin64_qmake_qt5} "$@"                         \
+popd                                                   \
+%endif                                                 \
+}                                                      \
+run_cygwin_qmake_qt5
+
+%cygwin_meson                                           \
+run_cygwin_meson()                                      \
+{                                                      \
+%if 0%{?cygwin_build_32bit} == 1                        \
+mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin32_meson "$@"}                             \
+popd                                                   \
+%endif                                                 \
+%if 0%{?cygwin_build_64bit} == 1                        \
+mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+    %{?cygwin64_meson "$@"}                             \
+popd                                                   \
+%endif                                                 \
+}                                                      \
+run_cygwin_meson
+
+%cygwin_ninja                                                        \
+run_cygwin_ninja()                                                   \
+{                                                                   \
+%if 0%{?cygwin_build_32bit} == 1                                     \
+ninja -C build_32bit$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN32_NINJA_ARGS \
+%endif                                                              \
+%if 0%{?cygwin_build_64bit} == 1                                     \
+ninja -C build_64bit$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN64_NINJA_ARGS \
+%endif                                                              \
+}                                                                   \
+run_cygwin_ninja
+
+%cygwin_ninja_install                                                    \
+run_cygwin_ninja_install()                                               \
+{                                                                       \
+%if 0%{?cygwin_build_32bit} == 1                                         \
+DESTDIR=%{buildroot} ninja -C build_32bit$CYGWIN_BUILDDIR_SUFFIX install \
+%endif                                                                  \
+%if 0%{?cygwin_build_64bit} == 1                                         \
+DESTDIR=%{buildroot} ninja -C build_64bit$CYGWIN_BUILDDIR_SUFFIX install \
+%endif                                                                  \
+}                                                                       \
+run_cygwin_ninja_install
+
+
+%cygwin_make_build           %cygwin_make %{_make_output_sync} %{?_smp_mflags} %{_make_verbose}
+%cygwin_make_install         %cygwin_make install DESTDIR=%{?buildroot} INSTALL="%{__install} -p"

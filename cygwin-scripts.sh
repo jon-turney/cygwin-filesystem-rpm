@@ -41,5 +41,5 @@ fi
 
 # NOTE: The use of 'eval' in combination with '$@' is a potential security risk
 #       We should find a more safe replacement for this command
-#       Suggestions are welcome at the Fedora MinGW mailing list
+#       Suggestions are welcome at the Fedora Cygwin mailing list
 eval "CYGWIN_CMAKE_NO_VERBOSE=1 `rpm --eval "%{$NAME}"`" '"$@"'

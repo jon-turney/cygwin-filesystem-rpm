@@ -1,0 +1,6 @@
+# Cygwin 32-bit target
+Triplet: i686-pc-cygwin
+SysrootDir: /usr/i686-pc-cygwin/sys-root/usr
+DefaultSearchPaths: /usr/i686-pc-cygwin/sys-root/usr/lib/pkgconfig:/usr/i686-pc-cygwin/sys-root/usr/share/pkgconfig
+SystemIncludePaths: /usr/i686-pc-cygwin/sys-root/usr/include
+SystemLibraryPaths: /usr/i686-pc-cygwin/sys-root/usr/lib

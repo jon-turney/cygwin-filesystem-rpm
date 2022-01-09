@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/sh
 # cygwin-find-debuginfo.sh - automagically generate debug info and file list
 # for inclusion in an rpm spec file for cygwin-* packages.
 
@@ -10,7 +10,7 @@ fi
 BUILDDIR=$1
 shift
 
-for f in `find $RPM_BUILD_ROOT -type f -name "*.exe" -or -name "*.dll"`
+for f in `find $RPM_BUILD_ROOT -type f -name "*.exe" -or -name "*.dll" -or -name "*.pyd"`
 do
 	case $(cygwin-objdump -h $f 2>/dev/null | egrep -o '(debug[\.a-z_]*|gnu.version)') in
 	    *debuglink*) continue ;;
@@ -23,20 +23,24 @@ do
 	esac
 
 	echo extracting debug info from $f
-	cygwin-objcopy --only-keep-debug $f $f.debug || :
-	pushd `dirname $f`
+	dest=${RPM_BUILD_ROOT}/usr/lib/debug${f/$RPM_BUILD_ROOT/}.debug
+	mkdir -p `dirname $dest`
+	cygwin-objcopy --only-keep-debug $f $dest || :
+	pushd `dirname $dest`
 	keep_symbols=`mktemp`
-	cygwin-nm --format=sysv --defined-only $f.debug | awk -F \| '{ if ($4 ~ "Function") print $1 }' | sort > "$keep_symbols"
-	cygwin-objcopy --add-gnu-debuglink=`basename $f.debug` --strip-unneeded --keep-symbols="$keep_symbols" `basename $f` || :
+  cygwin-nm $dest --format=sysv --defined-only | awk -F \| '{ if ($4 ~ "Function") print $1 }' | sort > "$keep_symbols"
+	cygwin-objcopy --add-gnu-debuglink=`basename $dest` --strip-unneeded $f --keep-symbols="$keep_symbols" || :
 	rm -f "$keep_symbols"
 	popd
 done
 
 for target in $@; do
-	prefix=`rpm --eval "%{${target}_prefix}"`
-	if [ ! -d $RPM_BUILD_ROOT$prefix ] ; then
+	prefix=`rpm --eval "%{_prefix}/%{${target}_target}"`
+	if [ ! -d ${RPM_BUILD_ROOT}/usr/lib/debug/$prefix ] ; then
 		continue
 	fi
-	find $RPM_BUILD_ROOT$prefix -type f -name "*.exe.debug" -or -name "*.dll.debug" |
+	find ${RPM_BUILD_ROOT}/usr/lib/debug/$prefix -type f -name "*.exe.debug" -or -name "*.dll.debug" -or -name "*.pyd.debug" |
 		sed -n -e "s#^$RPM_BUILD_ROOT##p" > $BUILDDIR/${target}-debugfiles.list
+        find ${RPM_BUILD_ROOT}/usr/lib/debug/$prefix/* -type d |
+		sed -n -e "s#^$RPM_BUILD_ROOT#%dir #p" >> $BUILDDIR/${target}-debugfiles.list
 done

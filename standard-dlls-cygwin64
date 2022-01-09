@@ -1194,10 +1194,10 @@ wmi.dll
 wmilib.sys
 wmiprop.dll
 wmisvc.dll
-wow64cpu.dll
-wow64.dll
-wow64mib.dll
-wow64win.dll
+wopccpu.dll
+wopc.dll
+wopcmib.dll
+wopcwin.dll
 wpd_ci.dll
 ws2_32.dll
 ws2help.dll
