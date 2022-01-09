@@ -70,10 +70,12 @@ environment for all Fedora Cygwin packages.
 %package -n cygwin32-filesystem
 Summary:        Cygwin cross compiler base filesystem and environment for the i686 target
 Requires:       %{name}-base = %{version}-%{release}
+%if 0%{?fedora} || 0%{?rhel} >= 9
 # Replace cygwin32-pkg-config
 Conflicts:      cygwin32-pkg-config <= 0.29.2-2
 Obsoletes:      cygwin32-pkg-config <= 0.29.2-2
 Provides:       cygwin32-pkg-config = 0.29.2-2
+%endif
 
 # Note about 'Provides: cygwin32(foo.dll)'
 # ------------------------------------------------------------
@@ -100,10 +102,12 @@ environment for all Fedora Cygwin packages.
 %package -n cygwin64-filesystem
 Summary:        Cygwin cross compiler base filesystem and environment for the x86_64 target
 Requires:       %{name}-base = %{version}-%{release}
+%if 0%{?fedora} || 0%{?rhel} >= 9
 # Replace cygwin64-pkg-config
 Conflicts:      cygwin64-pkg-config < 0.29.2-2
 Obsoletes:      cygwin64-pkg-config < 0.29.2-2
 Provides:       cygwin64-pkg-config = 0.29.2-2
+%endif
 
 Provides:       %(sed "s/\(.*\)/cygwin64(\1) /g" %{SOURCE17} | tr "\n" " ")
 Provides:       cygwin64(mscoree.dll)
@@ -281,6 +285,7 @@ mkdir -p %{buildroot}%{_datadir}/meson/cross
 install -m 0644 %{SOURCE18} %{buildroot}%{_datadir}/meson/cross/i686-pc-cygwin
 install -m 0644 %{SOURCE19} %{buildroot}%{_datadir}/meson/cross/x86_64-pc-cygwin
 
+%if 0%{?fedora} || 0%{?rhel} >= 9
 mkdir -p %{buildroot}%{pkgconfig_personalitydir}
 install -m 0644 %{SOURCE20} %{buildroot}%{pkgconfig_personalitydir}/i686-pc-cygwin.personality
 install -m 0644 %{SOURCE21} %{buildroot}%{pkgconfig_personalitydir}/x86_64-pc-cygwin.personality
@@ -289,6 +294,7 @@ install -m 0644 %{SOURCE21} %{buildroot}%{pkgconfig_personalitydir}/x86_64-pc-cy
 mkdir -p %{buildroot}%{_mandir}/man1/
 echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/i686-pc-cygwin-pkg-config.1
 echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-config.1
+%endif
 
 
 %files base
@@ -315,8 +321,10 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 %{_rpmconfigdir}/fileattrs/cygwin32.attr
 %{_datadir}/cygwin/toolchain-cygwin32.cmake
 %{_datadir}/meson/cross/i686-pc-cygwin
+%if 0%{?fedora} || 0%{?rhel} >= 9
 %{pkgconfig_personalitydir}/i686-pc-cygwin.personality
 %{_mandir}/man1/i686-pc-cygwin-pkg-config.1*
+%endif
 %dir %{_prefix}/lib/debug/%{_prefix}
 %dir %{_prefix}/lib/debug/%{_prefix}/i686-pc-cygwin
 
@@ -334,8 +342,10 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 %{_rpmconfigdir}/fileattrs/cygwin64.attr
 %{_datadir}/cygwin/toolchain-cygwin64.cmake
 %{_datadir}/meson/cross/x86_64-pc-cygwin
+%if 0%{?fedora} || 0%{?rhel} >= 9
 %{pkgconfig_personalitydir}/x86_64-pc-cygwin.personality
 %{_mandir}/man1/x86_64-pc-cygwin-pkg-config.1*
+%endif
 %dir %{_prefix}/lib/debug/%{_prefix}
 %dir %{_prefix}/lib/debug/%{_prefix}/x86_64-pc-cygwin
 
