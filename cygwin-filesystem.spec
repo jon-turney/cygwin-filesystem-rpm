@@ -47,7 +47,9 @@ Source103:      iso_3166.sed
 
 BuildRequires:  make
 BuildRequires:  iso-codes
+%if 0%{?fedora} || 0%{?rhel} >= 9
 BuildRequires:  pkgconf
+%endif
 
 
 %description
