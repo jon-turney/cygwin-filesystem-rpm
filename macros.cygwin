@@ -48,7 +48,7 @@ run_cygwin_autoreconf() \
     eval gettext_`grep '^version=' %{cygwin32_bindir}/autopoint`; \
     AUTOPOINT="%{cygwin32_bindir}/autopoint -V $gettext_version" ; export AUTOPOINT; \
   fi; \
-  autoreconf -fiv \
+  autoreconf -fiv "$@" \
 } \
 run_cygwin_autoreconf
 

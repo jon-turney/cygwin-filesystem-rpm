@@ -7,7 +7,7 @@
 
 Name:           cygwin-filesystem
 Version:        128
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
 License:        GPLv2+
@@ -355,6 +355,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+* Mon Jan 10 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-3
+- Fix passing of arguments to cygwin_autoreconf
+
 * Mon Jan 10 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-2
 - s/crt/w32api-runtime/g
 
