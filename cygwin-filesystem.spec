@@ -7,7 +7,7 @@
 
 Name:           cygwin-filesystem
 Version:        128
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
 License:        GPLv2+
@@ -355,6 +355,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+* Mon Jan 10 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-2
+- s/crt/w32api-runtime/g
+
 * Sat Jan 08 2022 Sandro Mani <manisandro@gmail.com> - 128-1
 - Add Boost_ARCHITECTURE to cmake toolchain file
 
@@ -590,10 +593,10 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 * Sat Mar 17 2012 Kalev Lember <kalevlember@gmail.com> - 95-8
 - Generate the list of cygwin32(...) and cygwin64(...) DLL name provides from
-  cygwin-crt import libraries
+  cygwin-w32api-runtime import libraries
 
 * Sat Mar 17 2012 Kalev Lember <kalevlember@gmail.com> - 95-7
-- Define cygwin_build_32bit/win64 in system macros, so that each
+- Define cygwin_build_32bit/64bit in system macros, so that each
   individual package wouldn't have to
 
 * Fri Mar 16 2012 Kalev Lember <kalevlember@gmail.com> - 95-6

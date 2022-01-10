@@ -32,10 +32,10 @@ for target in $targets; do
 		fi
 	done
 
-	# Add a dependency on filesystem and crt if necessary
+	# Add a dependency on filesystem and runtime if necessary
 	if [ $dll_found = true ]; then
 		echo "${target}-filesystem >= 95"
-		echo "${target}-crt"
+		echo "${target}-w32api-runtime"
 	fi
 
 	pkgconfig_files_found=false
