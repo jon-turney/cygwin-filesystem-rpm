@@ -7,7 +7,7 @@
 
 Name:           cygwin-filesystem
 Version:        128
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
 License:        GPLv2+
@@ -142,10 +142,12 @@ for i in cygwin32-configure cygwin32-cmake cygwin32-make cygwin32-meson cygwin32
          cygwin64-configure cygwin64-cmake cygwin64-make cygwin64-meson cygwin64-pkg-config ; do
   ln -s %{_libexecdir}/cygwin-scripts $i
 done
+%if 0%{?fedora} || 0%{?rhel} >= 9
 for i in i686-pc-cygwin-pkg-config  \
          x86_64-pc-cygwin-pkg-config ; do
   ln -s %{_bindir}/pkgconf $i
 done
+%endif
 popd
 
 mkdir -p %{buildroot}%{_sysconfdir}/profile.d
@@ -320,7 +322,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 %{_bindir}/cygwin32-make
 %{_bindir}/cygwin32-meson
 %{_bindir}/cygwin32-pkg-config
+%if 0%{?fedora} || 0%{?rhel} >= 9
 %{_bindir}/i686-pc-cygwin-pkg-config
+%endif
 %{_prefix}/i686-pc-cygwin
 %{_rpmconfigdir}/fileattrs/cygwin32.attr
 %{_datadir}/cygwin/toolchain-cygwin32.cmake
@@ -341,7 +345,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 %{_bindir}/cygwin64-make
 %{_bindir}/cygwin64-meson
 %{_bindir}/cygwin64-pkg-config
+%if 0%{?fedora} || 0%{?rhel} >= 9
 %{_bindir}/x86_64-pc-cygwin-pkg-config
+%endif
 %{_prefix}/x86_64-pc-cygwin
 %{_rpmconfigdir}/fileattrs/cygwin64.attr
 %{_datadir}/cygwin/toolchain-cygwin64.cmake
@@ -355,6 +361,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+* Sun Jan 30 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-4
+- Fix cygwin-pkg-config conflict on RHEL 7/8
+
 * Mon Jan 10 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-3
 - Fix passing of arguments to cygwin_autoreconf
 
