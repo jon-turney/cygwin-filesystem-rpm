@@ -7,7 +7,7 @@
 
 Name:           cygwin-filesystem
 Version:        128
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
 License:        GPLv2+
@@ -361,6 +361,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+* Thu Dec 22 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-5
+- Rebuilt for F38
+
 * Sun Jan 30 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-4
 - Fix cygwin-pkg-config conflict on RHEL 7/8
 
