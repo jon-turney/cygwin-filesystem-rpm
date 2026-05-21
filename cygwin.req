@@ -17,7 +17,6 @@ filelist=`sed "s/['\"]/\\\&/g"`
 
 dlls=$(echo $filelist | tr '[:blank:]' '\n' | grep -Ei '\.(dll|exe|pyd)$')
 pkgconfig_files=$(echo $filelist | tr '[:blank:]' '\n' | grep -Ei '\.(pc)$')
-py3_files=$(echo $filelist | tr '[:blank:]' '\n' | grep -Ei '\.(pyd?)$')
 
 for target in $targets; do
 	dll_found=false
@@ -46,21 +45,9 @@ for target in $targets; do
 		fi
 	done
 
-	py3_files_found=false
-	for f in $py3_files; do
-		if [[ $f =~ .*$host_triplet.*lib/python3.* ]]; then
-			py3_files_found=true
-			break
-		fi
-	done
-
 	# Add a dependency on $target-pkg-config if necessary
 	if [ $pkgconfig_files_found = true ]; then
 		echo "${target}-pkg-config"
 	fi
 
-        # Add a dependency on python if necessary
-        if [ $py3_files_found = true ]; then
-            echo "${target}-python3";
-        fi
 done | sort -u

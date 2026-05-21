@@ -28,7 +28,7 @@ do
 	cygwin-objcopy --only-keep-debug $f $dest || :
 	pushd `dirname $dest`
 	keep_symbols=`mktemp`
-  cygwin-nm $dest --format=sysv --defined-only | awk -F \| '{ if ($4 ~ "Function") print $1 }' | sort > "$keep_symbols"
+	cygwin-nm $dest --format=sysv --defined-only | awk -F \| '{ if ($4 ~ "Function") print $1 }' | sort > "$keep_symbols"
 	cygwin-objcopy --add-gnu-debuglink=`basename $dest` --strip-unneeded $f --keep-symbols="$keep_symbols" || :
 	rm -f "$keep_symbols"
 	popd

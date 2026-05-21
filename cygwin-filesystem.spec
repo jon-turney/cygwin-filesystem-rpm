@@ -365,6 +365,7 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 - Rebuilt for F38
 
 * Thu Feb 10 2022 Sandro Mani <manisandro@gmail.com> - 131-1
+- Move python dependency generation to cygwin32/64_python3.attr in cygwin-python3 package
 - More generic cygwin_pkg_name macros to also deduce cygwin package name from native name
 
 * Wed Feb 02 2022 Sandro Mani <manisandro@gmail.com> - 130-1
