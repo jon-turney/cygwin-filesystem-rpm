@@ -9,7 +9,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           cygwin-filesystem
-Version:        148
+Version:        150
 Release:        1%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
@@ -163,6 +163,8 @@ for target in i686-pc-cygwin x86_64-pc-cygwin; do
   mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/lib
   mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/lib/pkgconfig
   mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/lib/cmake
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/libexec
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/libexec/installed-tests
   mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/sbin
 
   # We don't normally package manual pages and info files, except
@@ -181,6 +183,7 @@ for target in i686-pc-cygwin x86_64-pc-cygwin; do
   mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/xml
   mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/icons
   mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/metainfo
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/installed-tests
 
   mkdir -p %{buildroot}%{_prefix}/lib/debug/%{_prefix}/$target
 done
@@ -322,6 +325,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+* Wed Aug 20 2025 Marc-André Lureau <marcandre.lureau@redhat.com> - 150-3
+- Own a few more directories.
+
 * Sat Sep 07 2024 Zephyr Lykos <fedora@mochaa.ws> - 148-7
 - Fix meson deprecation warnings
 
