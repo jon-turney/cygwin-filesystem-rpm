@@ -322,6 +322,11 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+ Thu Jun 06 2024 Sandro Mani <manisandro@gmail.com> - 148-4
+- Set __debug_package 1 in %mingw_debug_package (#2284193)
+* Thu Jun 06 2024 Sandro Mani <manisandro@gmail.com> - 148-4
+- Set __debug_package 1 in %cygwin_debug_package (#2284193)
+
 * Wed Sep 13 2023 Orion Poplawski <orion@nwra.com> - 148-1
 - Add pkgconfig provides
 

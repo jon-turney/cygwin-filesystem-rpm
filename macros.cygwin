@@ -16,6 +16,7 @@
 %cygwin_debug_install_post   %{cygwin_finddebuginfo} %{_builddir}/%{?buildsubdir} %{cygwin_build_targets}
 
 %cygwin_debug_package               \
+%global __debug_package 1           \
 %if 0%{?cygwin_build_32bit} == 1    \
 %{?cygwin32_debug_package}          \
 %endif                             \
