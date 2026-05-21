@@ -103,24 +103,6 @@ popd                                                   \
 }                                                      \
 run_cygwin_cmake
 
-%cygwin_cmake_kde4                                      \
-run_cygwin_cmake_kde4()                                 \
-{                                                      \
-%if 0%{?cygwin_build_32bit} == 1                        \
-mkdir -p build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
-pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
-    %{?cygwin32_cmake_kde4 "$@"}                        \
-popd                                                   \
-%endif                                                 \
-%if 0%{?cygwin_build_64bit} == 1                        \
-mkdir -p build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
-pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
-    %{?cygwin64_cmake_kde4 "$@"}                        \
-popd                                                   \
-%endif                                                 \
-}                                                      \
-run_cygwin_cmake_kde4
-
 %cygwin_qmake_qt5                                       \
 run_cygwin_qmake_qt5()                                  \
 {                                                      \

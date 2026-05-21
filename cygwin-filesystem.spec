@@ -9,7 +9,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           cygwin-filesystem
-Version:        143
+Version:        144
 Release:        1%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
@@ -320,6 +320,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+* Fri Dec 23 2022 Sandro Mani <manisandro@gmail.com> - 144-1
+- Drop cygwin-cmake-kde4 macros
+
 * Thu Dec 22 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-5
 - Rebuilt for F38
 

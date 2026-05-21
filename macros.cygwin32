@@ -146,10 +146,6 @@
   CYGWIN32_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR:PATH=%{cygwin32_includedir} ${CYGWIN32_CMAKE_ARGS}" \
   %cygwin32_cmake_generic
 
-%cygwin32_cmake_kde4 \
-  CYGWIN32_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR:PATH=%{cygwin32_includedir}/kde4 ${CYGWIN32_CMAKE_ARGS}" \
-  %cygwin32_cmake_generic
-
 %cygwin32_qmake_qt5 /usr/bin/cygwin32-qmake-qt5
 
 %cygwin32_meson %{cygwin32_env} ; \
