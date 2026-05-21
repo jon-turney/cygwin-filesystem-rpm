@@ -13,7 +13,7 @@ Version:        142
 Release:        1%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
-License:        GPLv2+
+License:        GPL-2.0-or-later
 URL:            https://copr.fedorainfracloud.org/coprs/yselkowitz/cygwin/
 BuildArch:      noarch
 
@@ -177,6 +177,8 @@ for target in i686-pc-cygwin x86_64-pc-cygwin; do
   mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/locale
   mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/pkgconfig
   mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/xml
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/icons
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/metainfo
 
   mkdir -p %{buildroot}%{_prefix}/lib/debug/%{_prefix}/$target
 done
