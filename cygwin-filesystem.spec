@@ -6,7 +6,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           cygwin-filesystem
-Version:        138
+Version:        139
 Release:        1%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
@@ -311,6 +311,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 %changelog
 * Thu Dec 22 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-5
 - Rebuilt for F38
+
+* Fri May 20 2022 Sandro Mani <manisandro@gmail.com> - 139-1
+- Set CMAKE_FIND_ROOT_PATH_MODE_PACKAGE in cmake toolchain files
 
 * Wed May 11 2022 Sandro Mani <manisandro@gmail.com> - 138-1
 - Drop CMAKE_INSTALL_LIBDIR from cygwin-cmake macros

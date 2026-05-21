@@ -18,9 +18,10 @@ SET(CMAKE_FIND_ROOT_PATH /usr/x86_64-pc-cygwin/sys-root/usr)
 
 # search for programs in the build host directories
 SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-# for libraries and headers in the target directories
+# for libraries, headers and packages in the target directories
 SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+SET(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 # Make sure Qt can be detected by CMake
 SET(QT_BINARY_DIR /usr/x86_64-pc-cygwin/bin /usr/bin)
