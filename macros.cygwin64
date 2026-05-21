@@ -151,7 +151,6 @@
   CYGWIN64_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR:PATH=%{cygwin64_includedir}/kde4 ${CYGWIN64_CMAKE_ARGS}" \
   %cygwin64_cmake_generic
 
-%cygwin64_qmake_qt4 /usr/bin/cygwin64-qmake-qt4
 %cygwin64_qmake_qt5 /usr/bin/cygwin64-qmake-qt5
 
 %cygwin64_meson %{cygwin64_env} ; \
