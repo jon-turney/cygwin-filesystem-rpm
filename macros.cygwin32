@@ -25,6 +25,7 @@
 
 %cygwin32_cflags          %{cygwin32_cppflags} -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4
 %cygwin32_cppflags        %{nil}
+%cygwin32_fflags          -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4
 %cygwin32_ldflags         -fstack-protector -lssp
 
 %cygwin32_cc              %{cygwin32_target}-gcc
@@ -73,6 +74,8 @@
     ac_cv_prog_CXX=no; export ac_cv_prog_CXX; \
     CXXFLAGS=; export CXXFLAGS; \
   fi; \
+  FFLAGS="${CYGWIN32_FFLAGS-%cygwin32_fflags}"; export FFLAGS; \
+  FCFLAGS="${CYGWIN32_FCFLAGS-%cygwin32_fflags}"; export FCFLAGS; \
   LDFLAGS="${CYGWIN32_LDFLAGS:-%cygwin32_ldflags}"; export LDFLAGS; \
   for i in `ls %{cygwin32_bindir}/*|grep -- "-config\$"` ; do \
     x=`basename $i|tr "a-z+-." "A-ZX_"`; \
@@ -155,6 +158,8 @@
   unset CC CFLAGS CPPFLAGS CXX CXXFLAGS LD LDFLAGS; \\\
   CFLAGS="${CYGWIN32_CFLAGS-%cygwin32_cflags}"; export CFLAGS; \\\
   CPPFLAGS="${CYGWIN32_CPPFLAGS-%cygwin32_cppflags}"; export CPPFLAGS; \\\
+  FFLAGS="${CYGWIN32_FFLAGS-%cygwin32_fflags}"; export FFLAGS; \
+  FCFLAGS="${CYGWIN32_FCFLAGS-%cygwin32_fflags}"; export FCFLAGS; \
   LDFLAGS="${CYGWIN32_LDFLAGS:-%cygwin32_ldflags}"; export LDFLAGS; \\\
   if test -f meson.build; then __cygwin32_topdir=.; \\\
   elif test -f ../meson.build; then __cygwin32_topdir=..; \\\

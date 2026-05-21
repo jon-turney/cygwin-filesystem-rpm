@@ -39,7 +39,8 @@ if [[ $NAME == *cmake* ]] ; then
     CYGWIN64_CXXFLAGS=${CYGWIN64_CXXFLAGS:-""}
 fi
 
-# NOTE: The use of 'eval' in combination with '$@' is a potential security risk
+# NOTE: The use of 'eval' in combination with '$@' in the evaluated rpm macro is
+#       a potential security risk.
 #       We should find a more safe replacement for this command
 #       Suggestions are welcome at the Fedora Cygwin mailing list
-eval "CYGWIN_CMAKE_NO_VERBOSE=1 `rpm --eval "%{$NAME}"`" '"$@"'
+eval "MINGW_CMAKE_NO_VERBOSE=1 `rpm --eval "%{$NAME}"`"
