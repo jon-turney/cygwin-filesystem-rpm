@@ -6,7 +6,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           cygwin-filesystem
-Version:        132
+Version:        136
 Release:        1%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
@@ -30,15 +30,10 @@ Source12:       toolchain-cygwin64.cmake
 Source13:       cygwin-find-lang.sh
 Source14:       cygwin32.attr
 Source15:       cygwin64.attr
-# generated with:
-# (rpm -ql cygwin32-w32api-runtime | grep '\.a$' | while read f ; do i686-pc-cygwin-dlltool   -I $f 2>/dev/null ; done) | sort | uniq | tr A-Z a-z > standard-dlls-cygwin32
-Source16:       standard-dlls-cygwin32
-# (rpm -ql cygwin64-w32api-runtime | grep '\.a$' | while read f ; do x86_64-pc-cygwin-dlltool -I $f 2>/dev/null ; done) | sort | uniq | tr A-Z a-z > standard-dlls-cygwin64
-Source17:       standard-dlls-cygwin64
-Source18:       toolchain-cygwin32.meson
-Source19:       toolchain-cygwin64.meson
-Source20:       pkgconf-personality-cygwin32
-Source21:       pkgconf-personality-cygwin64
+Source16:       toolchain-cygwin32.meson
+Source17:       toolchain-cygwin64.meson
+Source18:       pkgconf-personality-cygwin32
+Source19:       pkgconf-personality-cygwin64
 
 # Taken from the Fedora filesystem package
 Source101:      https://fedorahosted.org/filesystem/browser/lang-exceptions
@@ -81,23 +76,6 @@ Obsoletes:      cygwin32-pkg-config <= 0.29.2-2
 Provides:       cygwin32-pkg-config = 0.29.2-2
 %endif
 
-# Note about 'Provides: cygwin32(foo.dll)'
-# ------------------------------------------------------------
-#
-# We want to be able to build & install cygwin32 libraries without
-# necessarily needing to install wine.  (And certainly not needing to
-# install Windows!)  There is no requirement to have wine installed in
-# order to use the cygwin toolchain to develop software (ie. to
-# compile more stuff on top of it), so why require that?
-#
-# So for expediency, this base package provides the "missing" DLLs
-# from Windows.  Another way to do it would be to exclude these
-# proprietary DLLs in our find-requires checking script - essentially
-# it comes out the same either way.
-#
-Provides:       %(sed "s/\(.*\)/cygwin32(\1) /g" %{SOURCE16} | tr "\n" " ")
-Provides:       cygwin32(mscoree.dll)
-
 %description -n cygwin32-filesystem
 This package contains the base filesystem layout, RPM macros and
 environment for all Fedora Cygwin packages.
@@ -112,9 +90,6 @@ Conflicts:      cygwin64-pkg-config < 0.29.2-2
 Obsoletes:      cygwin64-pkg-config < 0.29.2-2
 Provides:       cygwin64-pkg-config = 0.29.2-2
 %endif
-
-Provides:       %(sed "s/\(.*\)/cygwin64(\1) /g" %{SOURCE17} | tr "\n" " ")
-Provides:       cygwin64(mscoree.dll)
 
 %description -n cygwin64-filesystem
 This package contains the base filesystem layout, RPM macros and
@@ -131,8 +106,6 @@ cp %{SOURCE0} COPYING
 
 
 %install
-mkdir -p %{buildroot}
-
 mkdir -p %{buildroot}%{_libexecdir}
 install -m 755 %{SOURCE9} %{buildroot}%{_libexecdir}/cygwin-scripts
 
@@ -162,67 +135,42 @@ install -m 644 %{SOURCE3} %{buildroot}%{macrosdir}/macros.cygwin64
 mkdir -p %{buildroot}%{_sysconfdir}/rpmlint
 install -m 644 %{SOURCE10} %{buildroot}%{_sysconfdir}/rpmlint/
 
-# Create the folders required for gcc and binutils
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/bin
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/lib
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/bin
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/lib
 
-# The Cygwin system root which will contain Cygwin native binaries
-# and Cygwin-specific header files, pkgconfig, etc.
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/bin
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/etc
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/include
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/include/sys
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/lib
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/lib/pkgconfig
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/lib/cmake
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/sbin
+for target in i686-pc-cygwin x86_64-pc-cygwin; do
+  # Create the folders required for gcc and binutils
+  mkdir -p %{buildroot}%{_prefix}/$target
+  mkdir -p %{buildroot}%{_prefix}/$target/bin
+  mkdir -p %{buildroot}%{_prefix}/$target/lib
 
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/bin
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/etc
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/include
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/include
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/lib
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/lib/pkgconfig
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/lib/cmake
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/sbin
+  # The MinGW system root which will contain Windows native binaries
+  # and Windows-specific header files, pkgconfig, etc.
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/bin
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/etc
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/include
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/include/sys
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/lib
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/lib/pkgconfig
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/lib/cmake
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/sbin
 
-# We don't normally package manual pages and info files, except
-# where those are not supplied by a Fedora native package.  So we
-# need to create the directories.
-#
-# Note that some packages try to install stuff in
-#   /usr/x86_64-pc-cygwin/sys-root/man and
-#   /usr/x86_64-pc-cygwin/sys-root/doc
-# but those are both packaging bugs.
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share/doc
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share/info
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share/man
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share/man/man{1,2,3,4,5,6,7,8,l,n}
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share/aclocal
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share/themes
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share/cmake
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share/locale
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share/pkgconfig
-mkdir -p %{buildroot}%{_prefix}/i686-pc-cygwin/sys-root/usr/share/xml
+  # We don't normally package manual pages and info files, except
+  # where those are not supplied by a Fedora native package.  So we
+  # need to create the directories.
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/doc
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/info
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/man
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/man/man{1,2,3,4,5,6,7,8,l,n}
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/aclocal
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/themes
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/cmake
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/locale
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/pkgconfig
+  mkdir -p %{buildroot}%{_prefix}/$target/sys-root/usr/share/xml
 
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/doc
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/info
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/man
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/man/man{1,2,3,4,5,6,7,8,l,n}
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/aclocal
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/themes
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/cmake
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/locale
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/pkgconfig
-mkdir -p %{buildroot}%{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/xml
+  mkdir -p %{buildroot}%{_prefix}/lib/debug/%{_prefix}/$target
+done
 
 mkdir -p %{buildroot}%{_prefix}/lib/debug/%{_prefix}/i686-pc-cygwin
 mkdir -p %{buildroot}%{_prefix}/lib/debug/%{_prefix}/x86_64-pc-cygwin
@@ -288,13 +236,13 @@ install -m 0644 %{SOURCE11} %{buildroot}%{_datadir}/cygwin/
 install -m 0644 %{SOURCE12} %{buildroot}%{_datadir}/cygwin/
 
 mkdir -p %{buildroot}%{_datadir}/meson/cross
-install -m 0644 %{SOURCE18} %{buildroot}%{_datadir}/meson/cross/i686-pc-cygwin
-install -m 0644 %{SOURCE19} %{buildroot}%{_datadir}/meson/cross/x86_64-pc-cygwin
+install -m 0644 %{SOURCE16} %{buildroot}%{_datadir}/meson/cross/i686-pc-cygwin
+install -m 0644 %{SOURCE17} %{buildroot}%{_datadir}/meson/cross/x86_64-pc-cygwin
 
 %if 0%{?fedora} || 0%{?rhel} >= 9
 mkdir -p %{buildroot}%{pkgconfig_personalitydir}
-install -m 0644 %{SOURCE20} %{buildroot}%{pkgconfig_personalitydir}/i686-pc-cygwin.personality
-install -m 0644 %{SOURCE21} %{buildroot}%{pkgconfig_personalitydir}/x86_64-pc-cygwin.personality
+install -m 0644 %{SOURCE18} %{buildroot}%{pkgconfig_personalitydir}/i686-pc-cygwin.personality
+install -m 0644 %{SOURCE19} %{buildroot}%{pkgconfig_personalitydir}/x86_64-pc-cygwin.personality
 
 # Link cygwin-pkg-config man pages to pkgconf(1)
 mkdir -p %{buildroot}%{_mandir}/man1/
@@ -363,6 +311,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 %changelog
 * Thu Dec 22 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-5
 - Rebuilt for F38
+
+* Tue May 03 2022 Sandro Mani <manisandro@gmail.com> - 136-1
+- Drop standard DLL provides, moved to w32api-runtime
 
 * Mon Feb 21 2022 Sandro Mani <manisandro@gmail.com> - 132-1
 - Create build_winXX directories with mkdir -p
