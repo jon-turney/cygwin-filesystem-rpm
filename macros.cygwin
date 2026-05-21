@@ -59,13 +59,13 @@ run_cygwin_configure()                                  \
     [ -f /usr/lib/rpm/redhat/$(basename $i) ] && %{__rm} -f $i && %{__cp} -fv /usr/lib/rpm/redhat/$(basename $i) $i ; \
 done ; \
 %if 0%{?cygwin_build_32bit} == 1                        \
-mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin32_configure} "$@"                         \
 popd                                                   \
 %endif                                                 \
 %if 0%{?cygwin_build_64bit} == 1                        \
-mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin64_configure} "$@"                         \
 popd                                                   \
@@ -89,13 +89,13 @@ run_cygwin_make
 run_cygwin_cmake()                                      \
 {                                                      \
 %if 0%{?cygwin_build_32bit} == 1                        \
-mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin32_cmake "$@"}                             \
 popd                                                   \
 %endif                                                 \
 %if 0%{?cygwin_build_64bit} == 1                        \
-mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin64_cmake "$@"}                             \
 popd                                                   \
@@ -107,13 +107,13 @@ run_cygwin_cmake
 run_cygwin_cmake_kde4()                                 \
 {                                                      \
 %if 0%{?cygwin_build_32bit} == 1                        \
-mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin32_cmake_kde4 "$@"}                        \
 popd                                                   \
 %endif                                                 \
 %if 0%{?cygwin_build_64bit} == 1                        \
-mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin64_cmake_kde4 "$@"}                        \
 popd                                                   \
@@ -125,13 +125,13 @@ run_cygwin_cmake_kde4
 run_cygwin_qmake_qt4()                                  \
 {                                                      \
 %if 0%{?cygwin_build_32bit} == 1                        \
-mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin32_qmake_qt4} "$@"                         \
 popd                                                   \
 %endif                                                 \
 %if 0%{?cygwin_build_64bit} == 1                        \
-mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin64_qmake_qt4} "$@"                         \
 popd                                                   \
@@ -143,13 +143,13 @@ run_cygwin_qmake_qt4
 run_cygwin_qmake_qt5()                                  \
 {                                                      \
 %if 0%{?cygwin_build_32bit} == 1                        \
-mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin32_qmake_qt5} "$@"                         \
 popd                                                   \
 %endif                                                 \
 %if 0%{?cygwin_build_64bit} == 1                        \
-mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin64_qmake_qt5} "$@"                         \
 popd                                                   \
@@ -161,13 +161,13 @@ run_cygwin_qmake_qt5
 run_cygwin_meson()                                      \
 {                                                      \
 %if 0%{?cygwin_build_32bit} == 1                        \
-mkdir build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_32bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin32_meson "$@"}                             \
 popd                                                   \
 %endif                                                 \
 %if 0%{?cygwin_build_64bit} == 1                        \
-mkdir build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
+mkdir -p build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin64_meson "$@"}                             \
 popd                                                   \
