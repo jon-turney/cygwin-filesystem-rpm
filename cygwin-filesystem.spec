@@ -58,6 +58,8 @@ environment for all Fedora Cygwin packages.
 %package base
 Summary:        Generic files which are needed for both cygwin32-filesystem and cygwin64-filesystem
 
+# We need this for cmake macros
+Requires:       cmake-rpm-macros
 Requires:       redhat-rpm-config
 %if 0%{?fedora} || 0%{?rhel} >= 9
 # For using pkgconf with Cygwin
@@ -320,6 +322,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+* Mon Sep 11 2023 Neal Gompa <ngompa@fedoraproject.org> - 147-3
+- Add dependency on cmake-rpm-macros
+
 * Fri Apr 07 2023 Sandro Mani <manisandro@gmail.com> - 147-1
 - Set cygwin_env before in run_cygwin_make
 
