@@ -9,7 +9,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           cygwin-filesystem
-Version:        147
+Version:        148
 Release:        1%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
@@ -322,6 +322,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+* Wed Sep 13 2023 Orion Poplawski <orion@nwra.com> - 148-1
+- Add pkgconfig provides
+
 * Mon Sep 11 2023 Neal Gompa <ngompa@fedoraproject.org> - 147-3
 - Add dependency on cmake-rpm-macros
 

@@ -21,4 +21,14 @@ for f in $dlls; do
     done
 done
 
+pcs=$(echo $filelist | tr '[:blank:]' '\n' | grep '\.pc$')
+
+for f in $pcs; do
+    basename=`basename $f .pc | tr '[:upper:]' '[:lower:]'`
+    for target in $targets; do
+        host_triplet=`rpm --eval "%{${target}_target}"`
+        [[ $f =~ .*$host_triplet.* ]] && echo "${target}-pkgconfig($basename)"
+    done
+done
+
 exit 0
