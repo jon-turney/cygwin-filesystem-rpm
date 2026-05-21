@@ -1,3 +1,6 @@
+# Define before mingw-binutils is build
+%bcond_with bootstrap
+
 %global debug_package %{nil}
 
 # Place RPM macros in %%{_rpmconfigdir}/macros.d if it exists (RPM 4.11+)
@@ -6,7 +9,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           cygwin-filesystem
-Version:        141
+Version:        142
 Release:        1%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
@@ -75,6 +78,9 @@ Conflicts:      cygwin32-pkg-config <= 0.29.2-2
 Obsoletes:      cygwin32-pkg-config <= 0.29.2-2
 Provides:       cygwin32-pkg-config = 0.29.2-2
 %endif
+%if %{without bootstrap}
+Requires:       cygwin-binutils-generic
+%endif
 
 %description -n cygwin32-filesystem
 This package contains the base filesystem layout, RPM macros and
@@ -89,6 +95,9 @@ Requires:       %{name}-base = %{version}-%{release}
 Conflicts:      cygwin64-pkg-config < 0.29.2-2
 Obsoletes:      cygwin64-pkg-config < 0.29.2-2
 Provides:       cygwin64-pkg-config = 0.29.2-2
+%endif
+%if %{without bootstrap}
+Requires:       cygwin-binutils-generic
 %endif
 
 %description -n cygwin64-filesystem
@@ -311,6 +320,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 %changelog
 * Thu Dec 22 2022 Yaakov Selkowitz <yselkowi@redhat.com> - 128-5
 - Rebuilt for F38
+
+* Tue Oct 18 2022 Sandro Mani <manisandro@gmail.com> - 142-1
+- Require cygwin-binutils-generic
 
 * Tue Sep 27 2022 Sandro Mani <manisandro@gmail.com> - 141-2
 - Replace egrep with grep -E
