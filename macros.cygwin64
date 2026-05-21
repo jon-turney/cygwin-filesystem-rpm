@@ -1,6 +1,6 @@
 # RPM macros for Fedora Cygwin.
 
-%cygwin64_pkg_name        %(echo %{name} | sed 's/^cygwin-/cygwin64-/')
+%cygwin64_pkg_name         %(echo %{name} | sed -E 's/^(cygwin-|)/cygwin64-/')
 %cygwin64_target          x86_64-pc-cygwin
 
 # Paths.
