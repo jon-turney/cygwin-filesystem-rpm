@@ -26,6 +26,8 @@ if [ "`basename $0`" = "i686-pc-cygwin-pkg-config" ] ; then
     NAME="cygwin32_pkg_config"
 elif [ "`basename $0`" = "x86_64-pc-cygwin-pkg-config" ] ; then
     NAME="cygwin64_pkg_config"
+elif [ "`basename $0`" = "aarch64-pc-cygwin-pkg-config" ] ; then
+    NAME="cygwin-aarch64_pkg_config"
 else
     NAME="`basename $0|tr -- - _`"
 fi
@@ -37,6 +39,8 @@ if [[ $NAME == *cmake* ]] ; then
     CYGWIN32_CXXFLAGS=${CYGWIN32_CXXFLAGS:-""}
     CYGWIN64_CFLAGS=${CYGWIN64_CFLAGS:-""}
     CYGWIN64_CXXFLAGS=${CYGWIN64_CXXFLAGS:-""}
+    CYGWIN_AARCH64_CFLAGS=${CYGWIN_AARCH64_CFLAGS:-""}
+    CYGWIN_AARCH64_CXXFLAGS=${CYGWIN_AARCH64_CXXFLAGS:-""}
 fi
 
 # NOTE: The use of 'eval' in combination with '$@' in the evaluated rpm macro is
