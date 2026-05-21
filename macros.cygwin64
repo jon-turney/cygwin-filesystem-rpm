@@ -138,7 +138,6 @@
         -DSYSCONF_INSTALL_DIR:PATH=%{cygwin64_sysconfdir} \\\
         -DSHARE_INSTALL_PREFIX:PATH=%{cygwin64_datadir} \\\
         -DCMAKE_INSTALL_PREFIX:PATH=%{cygwin64_prefix} \\\
-        -DCMAKE_INSTALL_LIBDIR:PATH=%{cygwin64_libdir} \\\
         ${CYGWIN_CMAKE_ARGS} \\\
         ${CYGWIN64_CMAKE_ARGS} \\\
         "$@" $__cygwin64_topdir
