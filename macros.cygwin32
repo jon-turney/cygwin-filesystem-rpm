@@ -50,7 +50,7 @@
 %cygwin32_windmc          %{cygwin32_target}-windmc
 %cygwin32_windres         %{cygwin32_target}-windres
 
-%cygwin32_env unset $(/usr/bin/env | egrep '^(\w+)=(.*)$' | egrep -vw 'PWD|USER|LANG' | /usr/bin/cut -d= -f1); \
+%cygwin32_env unset $(/usr/bin/env | grep -E '^(\w+)=(.*)$' | grep -Evw 'PWD|USER|LANG' | /usr/bin/cut -d= -f1); \
   if test -z "$PATH_ORIG" ; then \
     PATH_ORIG="$PATH"; export PATH_ORIG; \
   fi; \

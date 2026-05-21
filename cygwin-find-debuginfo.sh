@@ -12,7 +12,7 @@ shift
 
 for f in `find $RPM_BUILD_ROOT -type f -name "*.exe" -or -name "*.dll" -or -name "*.pyd"`
 do
-	case $(cygwin-objdump -h $f 2>/dev/null | egrep -o '(debug[\.a-z_]*|gnu.version)') in
+	case $(cygwin-objdump -h $f 2>/dev/null | grep -Eo '(debug[\.a-z_]*|gnu.version)') in
 	    *debuglink*) continue ;;
 	    *debug*) ;;
 	    *gnu.version*)
