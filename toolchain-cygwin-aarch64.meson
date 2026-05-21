@@ -1,0 +1,22 @@
+[binaries]
+c = 'aarch64-pc-cygwin-gcc'
+cpp = 'aarch64-pc-cygwin-g++'
+fortran = 'aarch64-pc-cygwin-gfortran'
+ar = '/usr/bin/aarch64-pc-cygwin-ar'
+pkg-config = '/usr/bin/aarch64-pc-cygwin-pkg-config'
+ranlib = '/usr/bin/aarch64-pc-cygwin-ranlib'
+strip = '/usr/bin/aarch64-pc-cygwin-strip'
+windres = '/usr/bin/aarch64-pc-cygwin-windres'
+dlltool = '/usr/bin/aarch64-pc-cygwin-dlltool'
+libgcrypt-config = '/usr/aarch64-pc-cygwin/sys-root/usr/bin/libgcrypt-config'
+lib-mkenums = '/usr/aarch64-w64-cygwin32/sys-root/usr/bin/glib-mkenums'
+
+[properties]
+root = '/usr/aarch64-pc-cygwin/sys-root/usr'
+needs_exe_wrapper = true
+
+[host_machine]
+system = 'cygwin'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'

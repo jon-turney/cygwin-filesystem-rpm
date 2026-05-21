@@ -1,0 +1,197 @@
+# RPM macros for Fedora Cygwin.
+
+%cygwin_aarch64_pkg_name         %(echo %{name} | sed -E 's/^(cygwin-|)/cygwin-aarch64-/')
+%cygwin_aarch64_target          aarch64-pc-cygwin
+
+# Paths.
+%cygwin_aarch64_sysroot         %{_prefix}/%{cygwin_aarch64_target}/sys-root
+%cygwin_aarch64_prefix          %{cygwin_aarch64_sysroot}/usr
+%cygwin_aarch64_exec_prefix     %{cygwin_aarch64_prefix}
+%cygwin_aarch64_bindir          %{cygwin_aarch64_exec_prefix}/bin
+%cygwin_aarch64_sbindir         %{cygwin_aarch64_exec_prefix}/sbin
+%cygwin_aarch64_libexecdir      %{cygwin_aarch64_exec_prefix}/libexec
+%cygwin_aarch64_libdir          %{cygwin_aarch64_exec_prefix}/lib
+%cygwin_aarch64_datadir         %{cygwin_aarch64_prefix}/share
+%cygwin_aarch64_docdir          %{cygwin_aarch64_prefix}/share/doc
+%cygwin_aarch64_infodir         %{cygwin_aarch64_prefix}/share/info
+%cygwin_aarch64_mandir          %{cygwin_aarch64_prefix}/share/man
+%cygwin_aarch64_sysconfdir      %{cygwin_aarch64_sysroot}/etc
+%cygwin_aarch64_sharedstatedir  %{cygwin_aarch64_sysroot}/srv
+%cygwin_aarch64_localstatedir   %{cygwin_aarch64_sysroot}/var
+%cygwin_aarch64_includedir      %{cygwin_aarch64_prefix}/include
+
+# Build macros.
+%cygwin_aarch64_host            %{cygwin_aarch64_target}
+
+%cygwin_aarch64_cflags          %{cygwin_aarch64_cppflags} -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4
+%cygwin_aarch64_cppflags        %{nil}
+%cygwin_aarch64_fflags          -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4
+%cygwin_aarch64_ldflags         -fstack-protector -lssp
+%cygwin_aarch64_rustflags       -Copt-level=3 -Cdebuginfo=2 -Ccodegen-units=1 -Cforce-frame-pointers=yes --cap-lints=warn
+
+%cygwin_aarch64_cc              %{cygwin_aarch64_target}-gcc
+%cygwin_aarch64_cxx             %{cygwin_aarch64_target}-g++
+%cygwin_aarch64_cpp             %{cygwin_aarch64_target}-gcc -E
+%cygwin_aarch64_addr2line       %{cygwin_aarch64_target}-addr2line
+%cygwin_aarch64_ar              %{cygwin_aarch64_target}-ar
+%cygwin_aarch64_as              %{cygwin_aarch64_target}-as
+%cygwin_aarch64_dlltool         %{cygwin_aarch64_target}-dlltool
+%cygwin_aarch64_dllwrap         %{cygwin_aarch64_target}-dllwrap
+%cygwin_aarch64_gcov            %{cygwin_aarch64_target}-gcov
+%cygwin_aarch64_gprof           %{cygwin_aarch64_target}-gprof
+%cygwin_aarch64_ld              %{cygwin_aarch64_target}-ld
+%cygwin_aarch64_nm              %{cygwin_aarch64_target}-nm
+%cygwin_aarch64_objcopy         %{cygwin_aarch64_target}-objcopy
+%cygwin_aarch64_objdump         %{cygwin_aarch64_target}-objdump
+%cygwin_aarch64_ranlib          %{cygwin_aarch64_target}-ranlib
+%cygwin_aarch64_readelf         %{cygwin_aarch64_target}-readelf
+%cygwin_aarch64_size            %{cygwin_aarch64_target}-size
+%cygwin_aarch64_strings         %{cygwin_aarch64_target}-strings
+%cygwin_aarch64_strip           %{cygwin_aarch64_target}-strip
+%cygwin_aarch64_windmc          %{cygwin_aarch64_target}-windmc
+%cygwin_aarch64_windres         %{cygwin_aarch64_target}-windres
+
+%cygwin_aarch64_env unset $(/usr/bin/env | grep -E '^(\w+)=(.*)$' | grep -Evw 'PWD|USER|LANG' | /usr/bin/cut -d= -f1); \
+  if test -z "$PATH_ORIG" ; then \
+    PATH_ORIG="$PATH"; export PATH_ORIG; \
+  fi; \
+  PATH="%{cygwin_aarch64_bindir}:$PATH_ORIG"; export PATH; \
+  HOST_CC=gcc; export HOST_CC; \
+  unset PKG_CONFIG_PATH; \
+  _PREFIX="%{_bindir}/%{cygwin_aarch64_target}-"; \
+  for i in `ls -1 ${_PREFIX}* | grep -v 'gcc-'`; do \
+    x=`echo $i|sed "s,${_PREFIX},,"|tr "a-z+-." "A-ZX__"`; \
+    declare -x $x="$i" ; export $x; \
+  done; \
+  unset _PREFIX; \
+  CC="${CYGWIN_AARCH64_CC:-%cygwin_aarch64_cc}"; export CC; \
+  CFLAGS="${CYGWIN_AARCH64_CFLAGS-%cygwin_aarch64_cflags}"; export CFLAGS; \
+  CPPFLAGS="${CYGWIN_AARCH64_CPPFLAGS-%cygwin_aarch64_cppflags}"; export CPPFLAGS; \
+  if [ -x "%{_bindir}/%{cygwin_aarch64_cxx}" ]; then \
+    CXX="${CYGWIN_AARCH64_CXX:-%cygwin_aarch64_cxx}"; export CXX; \
+    CXXFLAGS="${CYGWIN_AARCH64_CXXFLAGS-%cygwin_aarch64_cflags}"; export CXXFLAGS; \
+  else \
+    CXX=; export CXX; \
+    ac_cv_prog_CXX=no; export ac_cv_prog_CXX; \
+    CXXFLAGS=; export CXXFLAGS; \
+  fi; \
+  FFLAGS="${CYGWIN_AARCH64_FFLAGS-%cygwin_aarch64_fflags}"; export FFLAGS; \
+  FCFLAGS="${CYGWIN_AARCH64_FCFLAGS-%cygwin_aarch64_fflags}"; export FCFLAGS; \
+  LDFLAGS="${CYGWIN_AARCH64_LDFLAGS:-%cygwin_aarch64_ldflags}"; export LDFLAGS; \
+  RUSTFLAGS="${CYGWIN_AARCH64_RUSTFLAGS:-%cygwin_aarch64_rustflags}"; export RUSTFLAGS; \
+  for i in `ls %{cygwin_aarch64_bindir}/*|grep -- "-config\$"` ; do \
+    x=`basename $i|tr "a-z+-." "A-ZX_"`; \
+    declare -x $x="$i" ; export $x; \
+  done; \
+  unset x i
+
+%cygwin_aarch64_pkg_config %{cygwin_aarch64_target}-pkg-config "$@"
+%cygwin_aarch64_pkgconfig_personalitydir %{cygwin32_datadir}/pkgconfig/personality.d
+
+%cygwin_aarch64_configure %{cygwin_aarch64_env} ; \
+  __cygwin_aarch64_topdir=.; if ! test -x configure; then __cygwin_aarch64_topdir=..; fi; \\\
+  $__cygwin_aarch64_topdir/configure \\\
+	--host=%{cygwin_aarch64_host} \\\
+	--build=%_build \\\
+	--target=%{cygwin_aarch64_target} \\\
+	--prefix=%{cygwin_aarch64_prefix} \\\
+	--exec-prefix=%{cygwin_aarch64_exec_prefix} \\\
+	--bindir=%{cygwin_aarch64_bindir} \\\
+	--sbindir=%{cygwin_aarch64_sbindir} \\\
+	--sysconfdir=%{cygwin_aarch64_sysconfdir} \\\
+	--datadir=%{cygwin_aarch64_datadir} \\\
+	--includedir=%{cygwin_aarch64_includedir} \\\
+	--libdir=%{cygwin_aarch64_libdir} \\\
+	--libexecdir=%{cygwin_aarch64_libexecdir} \\\
+	--localstatedir=%{cygwin_aarch64_localstatedir} \\\
+	--sharedstatedir=%{cygwin_aarch64_sharedstatedir} \\\
+	--mandir=%{cygwin_aarch64_mandir} \\\
+	--infodir=%{cygwin_aarch64_infodir} \\\
+	${CYGWIN_CONFIGURE_ARGS} \\\
+	${CYGWIN_AARCH64_CONFIGURE_ARGS} "$@"
+
+%cygwin_aarch64_make %{cygwin_aarch64_env} ; \
+  make \\\
+	prefix=%{cygwin_aarch64_prefix} \\\
+	exec_prefix=%{cygwin_aarch64_exec_prefix} \\\
+	bindir=%{cygwin_aarch64_bindir} \\\
+	sbindir=%{cygwin_aarch64_sbindir} \\\
+	sysconfdir=%{cygwin_aarch64_sysconfdir} \\\
+	datadir=%{cygwin_aarch64_datadir} \\\
+	includedir=%{cygwin_aarch64_includedir} \\\
+	libdir=%{cygwin_aarch64_libdir} \\\
+	libexecdir=%{cygwin_aarch64_libexecdir} \\\
+	localstatedir=%{cygwin_aarch64_localstatedir} \\\
+	sharedstatedir=%{cygwin_aarch64_sharedstatedir} \\\
+	mandir=%{cygwin_aarch64_mandir} \\\
+	infodir=%{cygwin_aarch64_infodir} "$@"
+
+%cygwin_aarch64_cmake_generic %{cygwin_aarch64_env} ; \
+  PKG_CONFIG_LIBDIR="%{cygwin_aarch64_libdir}/pkgconfig:%{cygwin_aarch64_datadir}/pkgconfig"; export PKG_CONFIG_LIBDIR; \
+  if test -f CMakeLists.txt; then __cygwin_aarch64_topdir=.; \\\
+  elif test -f ../CMakeLists.txt; then __cygwin_aarch64_topdir=..; \\\
+  else __cygwin_aarch64_topdir=""; fi; \\\
+  if test "${CYGWIN_CMAKE_NO_VERBOSE}" == "" ; then \
+    CYGWIN_AARCH64_CMAKE_ARGS="${CYGWIN_AARCH64_CMAKE_ARGS} -DCMAKE_VERBOSE_MAKEFILE=ON" \
+  fi \
+  PATH=%{_prefix}/%{cygwin_aarch64_target}/bin:$PATH %__cmake \\\
+        -DCMAKE_TOOLCHAIN_FILE=/usr/share/cygwin/toolchain-cygwin-aarch64.cmake \\\
+        -DBUILD_SHARED_LIBS:BOOL=ON \\\
+        -DSYSCONF_INSTALL_DIR:PATH=%{cygwin_aarch64_sysconfdir} \\\
+        -DSHARE_INSTALL_PREFIX:PATH=%{cygwin_aarch64_datadir} \\\
+        -DCMAKE_INSTALL_PREFIX:PATH=%{cygwin_aarch64_prefix} \\\
+        ${CYGWIN_CMAKE_ARGS} \\\
+        ${CYGWIN_AARCH64_CMAKE_ARGS} \\\
+        "$@" $__cygwin_aarch64_topdir
+
+%cygwin_aarch64_cmake \
+  CYGWIN_AARCH64_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR:PATH=%{cygwin_aarch64_includedir} ${CYGWIN_AARCH64_CMAKE_ARGS}" \
+  %cygwin_aarch64_cmake_generic
+
+%cygwin_aarch64_qmake_qt5 /usr/bin/cygwin_aarch64-qmake-qt5
+
+%cygwin_aarch64_meson %{cygwin_aarch64_env} ; \
+  unset CC CFLAGS CPPFLAGS CXX CXXFLAGS LD LDFLAGS; \\\
+  CFLAGS="${CYGWIN_AARCH64_CFLAGS-%cygwin_aarch64_cflags}"; export CFLAGS; \\\
+  CPPFLAGS="${CYGWIN_AARCH64_CPPFLAGS-%cygwin_aarch64_cppflags}"; export CPPFLAGS; \\\
+  FFLAGS="${CYGWIN_AARCH64_FFLAGS-%cygwin_aarch64_fflags}"; export FFLAGS; \
+  FCFLAGS="${CYGWIN_AARCH64_FCFLAGS-%cygwin_aarch64_fflags}"; export FCFLAGS; \
+  LDFLAGS="${CYGWIN_AARCH64_LDFLAGS:-%cygwin_aarch64_ldflags}"; export LDFLAGS; \\\
+  if test -f meson.build; then __cygwin_aarch64_topdir=.; \\\
+  elif test -f ../meson.build; then __cygwin_aarch64_topdir=..; \\\
+  else __cygwin_aarch64_topdir=""; fi; \\\
+  %__meson setup \\\
+        --cross-file aarch64-pc-cygwin \\\
+        --default-library shared \\\
+        --prefix %{cygwin_aarch64_prefix} \\\
+        --bindir %{cygwin_aarch64_bindir} \\\
+        --sbindir %{cygwin_aarch64_sbindir} \\\
+        --sysconfdir %{cygwin_aarch64_sysconfdir} \\\
+        --datadir %{cygwin_aarch64_datadir} \\\
+        --includedir %{cygwin_aarch64_includedir} \\\
+        --libdir %{cygwin_aarch64_libdir} \\\
+        --libexecdir %{cygwin_aarch64_libexecdir} \\\
+        --localstatedir %{cygwin_aarch64_localstatedir} \\\
+        --sharedstatedir %{cygwin_aarch64_sharedstatedir} \\\
+        --mandir %{cygwin_aarch64_mandir} \\\
+        --infodir %{cygwin_aarch64_infodir} \\\
+        ${CYGWIN_MESON_ARGS} \\\
+        ${CYGWIN_AARCH64_MESON_ARGS} \\\
+        "$@" $__cygwin_aarch64_topdir
+
+%cygwin_aarch64_description This is the cross-compiled version of this library / tool.\
+You should only install this package if you want to cross-compile programs for \
+Cygwin x86_64.
+
+%cygwin_aarch64_debug_package                                                   \
+%package -n %{cygwin_aarch64_pkg_name}-debuginfo                                \
+Summary: Debug information for package %{cygwin_aarch64_pkg_name}               \
+Group: Development/Debug                                                 \
+BuildArch: noarch                                                        \
+%description -n %{cygwin_aarch64_pkg_name}-debuginfo                            \
+This package provides debug information for package %{cygwin_aarch64_pkg_name}. \
+Debug information is useful when developing applications that use this   \
+package or when debugging this package.                                  \
+%files -n %{cygwin_aarch64_pkg_name}-debuginfo -f cygwin_aarch64-debugfiles.list       \
+%defattr(-,root,root,-)                                                  \
+%{nil}

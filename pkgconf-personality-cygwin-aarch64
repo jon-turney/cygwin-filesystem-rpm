@@ -1,0 +1,6 @@
+# Cygwin aarch64 target
+Triplet: aarch64-pc-cygwin
+SysrootDir: /usr/aarch64-pc-cygwin/sys-root/usr
+DefaultSearchPaths: /usr/aarch64-pc-cygwin/sys-root/usr/lib/pkgconfig:/usr/aarch64-pc-cygwin/sys-root/usr/share/pkgconfig
+SystemIncludePaths: /usr/aarch64-pc-cygwin/sys-root/usr/include
+SystemLibraryPaths: /usr/aarch64-pc-cygwin/sys-root/usr/lib
