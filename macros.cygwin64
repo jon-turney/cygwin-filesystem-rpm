@@ -160,7 +160,7 @@
   if test -f meson.build; then __cygwin64_topdir=.; \\\
   elif test -f ../meson.build; then __cygwin64_topdir=..; \\\
   else __cygwin64_topdir=""; fi; \\\
-  %__meson \\\
+  %__meson setup \\\
         --cross-file x86_64-pc-cygwin \\\
         --default-library shared \\\
         --prefix %{cygwin64_prefix} \\\

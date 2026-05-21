@@ -322,8 +322,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
- Thu Jun 06 2024 Sandro Mani <manisandro@gmail.com> - 148-4
-- Set __debug_package 1 in %mingw_debug_package (#2284193)
+* Sat Sep 07 2024 Zephyr Lykos <fedora@mochaa.ws> - 148-7
+- Fix meson deprecation warnings
+
 * Thu Jun 06 2024 Sandro Mani <manisandro@gmail.com> - 148-4
 - Set __debug_package 1 in %cygwin_debug_package (#2284193)
 
