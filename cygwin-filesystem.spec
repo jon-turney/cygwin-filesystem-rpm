@@ -9,7 +9,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           cygwin-filesystem
-Version:        146
+Version:        147
 Release:        1%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
@@ -320,6 +320,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+* Fri Apr 07 2023 Sandro Mani <manisandro@gmail.com> - 147-1
+- Set cygwin_env before in run_cygwin_make
+
 * Wed Apr 05 2023 Sandro Mani <manisandro@gmail.com> - 146-1
 - Set RUSTFLAGS in cygwin env
 
