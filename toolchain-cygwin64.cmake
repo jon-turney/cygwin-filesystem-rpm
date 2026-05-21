@@ -4,13 +4,13 @@ SET(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 # specify the cross compiler
 IF(NOT DEFINED ENV{CC})
-    SET(CMAKE_C_COMPILER /usr/bin/x86_64-pc-cygwin-gcc)
+    SET(CMAKE_C_COMPILER x86_64-pc-cygwin-gcc)
 ENDIF()
 IF(NOT DEFINED ENV{CXX})
-    SET(CMAKE_CXX_COMPILER /usr/bin/x86_64-pc-cygwin-g++)
+    SET(CMAKE_CXX_COMPILER x86_64-pc-cygwin-g++)
 ENDIF()
 IF(NOT DEFINED ENV{FC})
-    SET(CMAKE_Fortran_COMPILER /usr/bin/x86_64-pc-cygwin-gfortran)
+    SET(CMAKE_Fortran_COMPILER x86_64-pc-cygwin-gfortran)
 ENDIF()
 
 # where is the target environment

@@ -9,7 +9,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           cygwin-filesystem
-Version:        150
+Version:        151
 Release:        1%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
@@ -325,6 +325,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 
 
 %changelog
+* Thu Jan 22 2026 Sandro Mani <manisandro@gmail.com> - 151-1
+- Use relative cross compiler paths in cmake toolchain files (#2430586)
+
 * Wed Aug 20 2025 Marc-André Lureau <marcandre.lureau@redhat.com> - 150-3
 - Own a few more directories.
 
