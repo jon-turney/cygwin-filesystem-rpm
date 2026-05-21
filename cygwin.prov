@@ -5,7 +5,7 @@
 
 targets=$@
 if [ -z "$targets" ] ; then
-    echo "Usage: $0 [ cygwin32 ] [ cygwin64 ]"
+    echo "Usage: $0 [ cygwin32 ] [ cygwin64 ] [ cygwin-aarch64 ]"
     exit 1
 fi
 

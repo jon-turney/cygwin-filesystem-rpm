@@ -21,22 +21,28 @@ Source0:        COPYING
 Source1:        macros.cygwin
 Source2:        macros.cygwin32
 Source3:        macros.cygwin64
-Source4:        cygwin32.sh
-Source5:        cygwin64.sh
-Source6:        cygwin-find-debuginfo.sh
-Source7:        cygwin.req
-Source8:        cygwin.prov
-Source9:        cygwin-scripts.sh
-Source10:       cygwin-rpmlint.config
-Source11:       toolchain-cygwin32.cmake
-Source12:       toolchain-cygwin64.cmake
-Source13:       cygwin-find-lang.sh
-Source14:       cygwin32.attr
-Source15:       cygwin64.attr
-Source16:       toolchain-cygwin32.meson
-Source17:       toolchain-cygwin64.meson
-Source18:       pkgconf-personality-cygwin32
-Source19:       pkgconf-personality-cygwin64
+Source4:        macros.cygwin-aarch64
+Source5:        cygwin32.sh
+Source6:        cygwin64.sh
+Source7:        cygwin-aarch64.sh
+Source8:        cygwin-find-debuginfo.sh
+Source9:        cygwin.req
+Source10:       cygwin.prov
+Source11:       cygwin-scripts.sh
+Source12:       cygwin-rpmlint.config
+Source13:       toolchain-cygwin32.cmake
+Source14:       toolchain-cygwin64.cmake
+Source15:       toolchain-cygwin-aarch64.cmake
+Source16:       cygwin-find-lang.sh
+Source17:       cygwin32.attr
+Source18:       cygwin64.attr
+Source19:       cygwin-aarch64.attr
+Source20:       toolchain-cygwin32.meson
+Source21:       toolchain-cygwin64.meson
+Source22:       toolchain-cygwin-aarch64.meson
+Source23:       pkgconf-personality-cygwin32
+Source24:       pkgconf-personality-cygwin64
+Source25:       pkgconf-personality-cygwin-aarch64
 
 # Taken from the Fedora filesystem package
 Source101:      https://fedorahosted.org/filesystem/browser/lang-exceptions
@@ -56,7 +62,7 @@ environment for all Fedora Cygwin packages.
 
 
 %package base
-Summary:        Generic files which are needed for both cygwin32-filesystem and cygwin64-filesystem
+Summary:        Generic files which are needed for cygwin filesystem
 
 # We need this for cmake macros
 Requires:       cmake-rpm-macros
@@ -107,6 +113,25 @@ This package contains the base filesystem layout, RPM macros and
 environment for all Fedora Cygwin packages.
 
 
+%package -n cygwin-aarch64-filesystem
+Summary:        Cygwin cross compiler base filesystem and environment for the aarch64 target
+Requires:       %{name}-base = %{version}-%{release}
+%if 0%{?fedora} || 0%{?rhel} >= 9
+# Replace cygwin-aarch64-pkg-config
+Conflicts:      cygwin-aarch64-pkg-config < 0.29.2-2
+Obsoletes:      cygwin-aarch64-pkg-config < 0.29.2-2
+Provides:       cygwin-aarch64-pkg-config = 0.29.2-2
+%endif
+%if %{without bootstrap}
+Requires:       cygwin-binutils-generic
+%endif
+
+%description -n cygwin-aarch64-filesystem
+This package contains the base filesystem layout, RPM macros and
+environment for all Fedora Cygwin packages.
+
+
+
 %prep
 %setup -q -c -T
 cp %{SOURCE0} COPYING
@@ -118,36 +143,40 @@ cp %{SOURCE0} COPYING
 
 %install
 mkdir -p %{buildroot}%{_libexecdir}
-install -m 755 %{SOURCE9} %{buildroot}%{_libexecdir}/cygwin-scripts
+install -m 755 %{SOURCE11} %{buildroot}%{_libexecdir}/cygwin-scripts
 
 mkdir -p %{buildroot}%{_bindir}
 pushd %{buildroot}%{_bindir}
 for i in cygwin32-configure cygwin32-cmake cygwin32-make cygwin32-meson cygwin32-pkg-config \
-         cygwin64-configure cygwin64-cmake cygwin64-make cygwin64-meson cygwin64-pkg-config ; do
+         cygwin64-configure cygwin64-cmake cygwin64-make cygwin64-meson cygwin64-pkg-config \
+         cygwin-aarch64-configure cygwin-aarch64-cmake cygwin-aarch64-make cygwin-aarch64-meson cygwin-aarch64-pkg-config ; do
   ln -s %{_libexecdir}/cygwin-scripts $i
 done
 %if 0%{?fedora} || 0%{?rhel} >= 9
 for i in i686-pc-cygwin-pkg-config  \
-         x86_64-pc-cygwin-pkg-config ; do
+         x86_64-pc-cygwin-pkg-config \
+         aarch64-pc-cygwin-pkg-config ; do
   ln -s %{_bindir}/pkgconf $i
 done
 %endif
 popd
 
 mkdir -p %{buildroot}%{_sysconfdir}/profile.d
-install -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/profile.d/
 install -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/profile.d/
+install -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/profile.d/
+install -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/profile.d/
 
 mkdir -p %{buildroot}%{macrosdir}
 install -m 644 %{SOURCE1} %{buildroot}%{macrosdir}/macros.cygwin
 install -m 644 %{SOURCE2} %{buildroot}%{macrosdir}/macros.cygwin32
 install -m 644 %{SOURCE3} %{buildroot}%{macrosdir}/macros.cygwin64
+install -m 644 %{SOURCE4} %{buildroot}%{macrosdir}/macros.cygwin-aarch64
 
 mkdir -p %{buildroot}%{_sysconfdir}/rpmlint
-install -m 644 %{SOURCE10} %{buildroot}%{_sysconfdir}/rpmlint/
+install -m 644 %{SOURCE12} %{buildroot}%{_sysconfdir}/rpmlint/
 
 
-for target in i686-pc-cygwin x86_64-pc-cygwin; do
+for target in i686-pc-cygwin x86_64-pc-cygwin aarch64-pc-cygwin; do
   # Create the folders required for gcc and binutils
   mkdir -p %{buildroot}%{_prefix}/$target
   mkdir -p %{buildroot}%{_prefix}/$target/bin
@@ -206,6 +235,7 @@ grep -v "^$" %{buildroot}/iso_639.tab | grep -v "^#" | while read a b c d ; do
     fi
     echo "%lang(${locale}) %{_prefix}/i686-pc-cygwin/sys-root/usr/share/locale/${locale}" >> filelist_cygwin32
     echo "%lang(${locale}) %{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/locale/${locale}" >> filelist_cygwin64
+    echo "%lang(${locale}) %{_prefix}/aarch64-pc-cygwin/sys-root/usr/share/locale/${locale}" >> filelist_cygwin_aarch64
 done
 
 cat %{SOURCE101} | grep -v "^#" | grep -v "^$" | while read loc ; do
@@ -227,43 +257,49 @@ cat %{SOURCE101} | grep -v "^#" | grep -v "^$" | while read loc ; do
     fi
     echo "%lang(${locale}) %{_prefix}/i686-pc-cygwin/sys-root/usr/share/locale/${loc}" >> filelist_cygwin32
     echo "%lang(${locale}) %{_prefix}/x86_64-pc-cygwin/sys-root/usr/share/locale/${loc}" >> filelist_cygwin64
+    echo "%lang(${locale}) %{_prefix}/aarch64-pc-cygwin/sys-root/usr/share/locale/${loc}" >> filelist_cygwin_aarch64
 done
 
 rm -f %{buildroot}/iso_639.tab
 rm -f %{buildroot}/iso_3166.tab
 
-cat filelist_cygwin32 filelist_cygwin64 | grep "locale" | while read a b ; do
+cat filelist_cygwin32 filelist_cygwin64 filelist_cygwin_aarch64 | grep "locale" | while read a b ; do
     mkdir -p -m 755 %{buildroot}/$b/LC_MESSAGES
 done
 
 # NB. NOT _libdir
 mkdir -p %{buildroot}/usr/lib/rpm
-install -m 0755 %{SOURCE6} %{buildroot}%{_rpmconfigdir}
-install -m 0755 %{SOURCE7} %{buildroot}%{_rpmconfigdir}
 install -m 0755 %{SOURCE8} %{buildroot}%{_rpmconfigdir}
-install -m 0755 %{SOURCE13} %{buildroot}%{_rpmconfigdir}
+install -m 0755 %{SOURCE9} %{buildroot}%{_rpmconfigdir}
+install -m 0755 %{SOURCE10} %{buildroot}%{_rpmconfigdir}
+install -m 0755 %{SOURCE16} %{buildroot}%{_rpmconfigdir}
 
 mkdir -p %{buildroot}/usr/lib/rpm/fileattrs
-install -m 0644 %{SOURCE14} %{buildroot}%{_rpmconfigdir}/fileattrs/
-install -m 0644 %{SOURCE15} %{buildroot}%{_rpmconfigdir}/fileattrs/
+install -m 0644 %{SOURCE17} %{buildroot}%{_rpmconfigdir}/fileattrs/
+install -m 0644 %{SOURCE18} %{buildroot}%{_rpmconfigdir}/fileattrs/
+install -m 0644 %{SOURCE19} %{buildroot}%{_rpmconfigdir}/fileattrs/
 
 mkdir -p %{buildroot}%{_datadir}/cygwin
-install -m 0644 %{SOURCE11} %{buildroot}%{_datadir}/cygwin/
-install -m 0644 %{SOURCE12} %{buildroot}%{_datadir}/cygwin/
+install -m 0644 %{SOURCE13} %{buildroot}%{_datadir}/cygwin/
+install -m 0644 %{SOURCE14} %{buildroot}%{_datadir}/cygwin/
+install -m 0644 %{SOURCE15} %{buildroot}%{_datadir}/cygwin/
 
 mkdir -p %{buildroot}%{_datadir}/meson/cross
-install -m 0644 %{SOURCE16} %{buildroot}%{_datadir}/meson/cross/i686-pc-cygwin
-install -m 0644 %{SOURCE17} %{buildroot}%{_datadir}/meson/cross/x86_64-pc-cygwin
+install -m 0644 %{SOURCE20} %{buildroot}%{_datadir}/meson/cross/i686-pc-cygwin
+install -m 0644 %{SOURCE21} %{buildroot}%{_datadir}/meson/cross/x86_64-pc-cygwin
+install -m 0644 %{SOURCE22} %{buildroot}%{_datadir}/meson/cross/aarch64-pc-cygwin
 
 %if 0%{?fedora} || 0%{?rhel} >= 9
 mkdir -p %{buildroot}%{pkgconfig_personalitydir}
-install -m 0644 %{SOURCE18} %{buildroot}%{pkgconfig_personalitydir}/i686-pc-cygwin.personality
-install -m 0644 %{SOURCE19} %{buildroot}%{pkgconfig_personalitydir}/x86_64-pc-cygwin.personality
+install -m 0644 %{SOURCE23} %{buildroot}%{pkgconfig_personalitydir}/i686-pc-cygwin.personality
+install -m 0644 %{SOURCE24} %{buildroot}%{pkgconfig_personalitydir}/x86_64-pc-cygwin.personality
+install -m 0644 %{SOURCE25} %{buildroot}%{pkgconfig_personalitydir}/aarch64-pc-cygwin.personality
 
 # Link cygwin-pkg-config man pages to pkgconf(1)
 mkdir -p %{buildroot}%{_mandir}/man1/
 echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/i686-pc-cygwin-pkg-config.1
 echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-config.1
+echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/aarch64-pc-cygwin-pkg-config.1
 %endif
 
 
@@ -324,7 +360,33 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 %dir %{_prefix}/lib/debug/%{_prefix}/x86_64-pc-cygwin
 
 
+%files -n cygwin-aarch64-filesystem
+%{macrosdir}/macros.cygwin-aarch64
+%config(noreplace) %{_sysconfdir}/profile.d/cygwin-aarch64.sh
+%{_bindir}/cygwin-aarch64-configure
+%{_bindir}/cygwin-aarch64-cmake
+%{_bindir}/cygwin-aarch64-make
+%{_bindir}/cygwin-aarch64-meson
+%{_bindir}/cygwin-aarch64-pkg-config
+%if 0%{?fedora} || 0%{?rhel} >= 9
+%{_bindir}/aarch64-pc-cygwin-pkg-config
+%endif
+%{_prefix}/aarch64-pc-cygwin
+%{_rpmconfigdir}/fileattrs/cygwin-aarch64.attr
+%{_datadir}/cygwin/toolchain-cygwin-aarch64.cmake
+%{_datadir}/meson/cross/aarch64-pc-cygwin
+%if 0%{?fedora} || 0%{?rhel} >= 9
+%{pkgconfig_personalitydir}/aarch64-pc-cygwin.personality
+%{_mandir}/man1/aarch64-pc-cygwin-pkg-config.1*
+%endif
+%dir %{_prefix}/lib/debug/%{_prefix}
+%dir %{_prefix}/lib/debug/%{_prefix}/aarch64-pc-cygwin
+
+
 %changelog
+* Thu May 21 2026 Jon Turney <jon.turney@dronecode.org.uk> 151-1
+- Add cygwin-aarch64, modelled after the way mingw-ucrt was added to mingw-filesystem.
+
 * Thu Jan 22 2026 Sandro Mani <manisandro@gmail.com> - 151-1
 - Use relative cross compiler paths in cmake toolchain files (#2430586)
 

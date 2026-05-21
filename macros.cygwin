@@ -1,8 +1,9 @@
 # RPM macros for the Fedora Cygwin Cross Compiler collection
 
-%cygwin_build_targets        cygwin32 cygwin64
+%cygwin_build_targets        cygwin32 cygwin64 cygwin-aarch64
 %cygwin_build_32bit          1
 %cygwin_build_64bit          1
+%cygwin_build_aarch64        1
 
 %cygwin_strip                cygwin-strip
 %cygwin_objdump              cygwin-objdump
@@ -21,6 +22,9 @@
 %{?cygwin32_debug_package}          \
 %endif                             \
 %if 0%{?cygwin_build_64bit} == 1    \
+%{?cygwin64_debug_package}          \
+%endif                             \
+%if 0%{?cygwin_build_aarch64} == 1  \
 %{?cygwin64_debug_package}          \
 %endif                             \
 %{nil}
@@ -43,6 +47,9 @@ run_cygwin_autoreconf() \
   fi; \
   if [ -d %{cygwin64_datadir}/aclocal ]; then \
     ACLOCAL_FLAGS="$ACLOCAL_FLAGS -I %{cygwin64_datadir}/aclocal"; \
+  fi; \
+  if [ -d %{cygwin_aarch64_datadir}/aclocal ]; then \
+    ACLOCAL_FLAGS="$ACLOCAL_FLAGS -I %{cygwin_aarch64_datadir}/aclocal"; \
   fi; \
   ACLOCAL="%{_bindir}/aclocal $ACLOCAL_FLAGS"; export ACLOCAL; \
   if [ -x %{cygwin32_bindir}/autopoint ]; then \
@@ -71,6 +78,12 @@ pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin64_configure} "$@"                         \
 popd                                                   \
 %endif                                                 \
+%if 0%{?cygwin_build_aarch64} == 1                     \
+mkdir -p build_aarch64$CYGWIN_BUILDDIR_SUFFIX          \
+pushd build_aarch64$CYGWIN_BUILDDIR_SUFFIX             \
+    %{?cygwin_aarch64_configure} "$@"                  \
+popd                                                   \
+%endif                                                 \
 }                                                      \
 run_cygwin_configure
 
@@ -84,6 +97,10 @@ run_cygwin_make()                                                    \
 %if 0%{?cygwin_build_64bit} == 1                                     \
 %{cygwin64_env}                                                      \
 %{__make} -C build_64bit$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN64_MAKE_ARGS   \
+%endif                                                              \
+%if 0%{?cygwin_build_aarch64} == 1                                  \
+%{cygwin_aarch64_env}                                               \
+%{__make} -C build_aarch64$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN_AARCH64_MAKE_ARGS   \
 %endif                                                              \
 }                                                                   \
 run_cygwin_make
@@ -101,6 +118,12 @@ popd                                                   \
 mkdir -p build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
 pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin64_cmake "$@"}                             \
+popd                                                   \
+%endif                                                 \
+%if 0%{?cygwin_build_aarch64} == 1                     \
+mkdir -p build_aarch64$CYGWIN_BUILDDIR_SUFFIX          \
+pushd build_aarch64$CYGWIN_BUILDDIR_SUFFIX             \
+    %{?cygwin_aarch64_cmake "$@"}                      \
 popd                                                   \
 %endif                                                 \
 }                                                      \
@@ -121,6 +144,12 @@ pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin64_qmake_qt5} "$@"                         \
 popd                                                   \
 %endif                                                 \
+%if 0%{?cygwin_build_aarch64} == 1                     \
+mkdir -p build_aarch64$CYGWIN_BUILDDIR_SUFFIX          \
+pushd build_aarch64$CYGWIN_BUILDDIR_SUFFIX             \
+    %{?cygwin_aarch64_qmake_qt5} "$@"                  \
+popd                                                   \
+%endif                                                 \
 }                                                      \
 run_cygwin_qmake_qt5
 
@@ -139,6 +168,12 @@ pushd build_64bit$CYGWIN_BUILDDIR_SUFFIX                \
     %{?cygwin64_meson "$@"}                             \
 popd                                                   \
 %endif                                                 \
+%if 0%{?cygwin_build_aarch64} == 1                     \
+mkdir -p build_aarch64$CYGWIN_BUILDDIR_SUFFIX          \
+pushd build_aarch64$CYGWIN_BUILDDIR_SUFFIX             \
+    %{?cygwin_aarch64_meson "$@"}                      \
+popd                                                   \
+%endif                                                 \
 }                                                      \
 run_cygwin_meson
 
@@ -151,6 +186,9 @@ ninja -C build_32bit$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN32_NINJA_ARGS \
 %if 0%{?cygwin_build_64bit} == 1                                     \
 ninja -C build_64bit$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN64_NINJA_ARGS \
 %endif                                                              \
+%if 0%{?cygwin_build_aarch64} == 1                                  \
+ninja -C build_aarch64$CYGWIN_BUILDDIR_SUFFIX "$@" $CYGWIN_AARCH64_NINJA_ARGS \
+%endif                                                              \
 }                                                                   \
 run_cygwin_ninja
 
@@ -162,6 +200,9 @@ DESTDIR=%{buildroot} ninja -C build_32bit$CYGWIN_BUILDDIR_SUFFIX install \
 %endif                                                                  \
 %if 0%{?cygwin_build_64bit} == 1                                         \
 DESTDIR=%{buildroot} ninja -C build_64bit$CYGWIN_BUILDDIR_SUFFIX install \
+%endif                                                                  \
+%if 0%{?cygwin_build_aarch64} == 1                                      \
+DESTDIR=%{buildroot} ninja -C build_aarch64$CYGWIN_BUILDDIR_SUFFIX install \
 %endif                                                                  \
 }                                                                       \
 run_cygwin_ninja_install

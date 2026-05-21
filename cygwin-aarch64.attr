@@ -1,0 +1,3 @@
+%__cygwin_aarch64_provides     %{_rpmconfigdir}/cygwin.prov cygwin-aarch64
+%__cygwin_aarch64_requires     %{_rpmconfigdir}/cygwin.req cygwin-aarch64
+%__cygwin_aarch64_path		^%{cygwin_aarch64_prefix}/.*\.([Dd][Ll][Ll]|[Ee][Xx][Ee]|[Pp][Yy][Dd]?|[Pp][Cc])$
