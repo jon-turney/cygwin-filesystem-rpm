@@ -1,6 +1,6 @@
 # RPM macros for the Fedora Cygwin Cross Compiler collection
 
-%cygwin_build_targets        cygwin32 cygwin64 cygwin-aarch64
+%cygwin_build_targets        cygwin32 cygwin64 cygwin_aarch64
 %cygwin_build_32bit          1
 %cygwin_build_64bit          1
 %cygwin_build_aarch64        1
@@ -25,7 +25,7 @@
 %{?cygwin64_debug_package}          \
 %endif                             \
 %if 0%{?cygwin_build_aarch64} == 1  \
-%{?cygwin64_debug_package}          \
+%{?cygwin_aarch64_debug_package}          \
 %endif                             \
 %{nil}
 
