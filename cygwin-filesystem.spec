@@ -10,7 +10,7 @@
 
 Name:           cygwin-filesystem
 Version:        151
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Cygwin cross compiler base filesystem and environment
 
 License:        GPL-2.0-or-later
@@ -384,6 +384,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/aarch64-pc-cygwin-pkg-co
 
 
 %changelog
+* Sun Sep 27 2026 Jon Turney <jon.turney@dronecode.org.uk> 151-3
+- Fix typos in cygwin-aarch64 debug package macros
+
 * Thu May 21 2026 Jon Turney <jon.turney@dronecode.org.uk> 151-2
 - Add cygwin-aarch64, modelled after the way mingw-ucrt was added to mingw-filesystem.
 
