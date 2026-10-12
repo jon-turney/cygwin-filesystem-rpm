@@ -1,0 +1,263 @@
+#!/bin/bash
+#
+# cygwin-pkg-tool
+#
+# The MIT License (MIT)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+# more or less the bare minimum needed to fetch and unpack a cygwin package into
+# the cross-build sysroot, ripped from an ancient version of apt-cyg
+
+shopt -s nullglob
+
+function check-root {
+  if [[ $EUID -ne 0 ]]
+  then
+    echo "$0: must be run as root"
+    exit 1
+  fi
+}
+
+function find-workspace {
+  # default working directory and mirror
+  mirror="https://mirrors.kernel.org/sourceware/cygwin/"
+  cache="/tmp/cygwin-pkg-cache/"
+  mirrordir=$(sed '
+  s / %2f g
+  s : %3a g
+  ' <<< "$mirror")
+
+  mkdir -p "$cache/$mirrordir/$arch"
+  cd "$cache/$mirrordir/$arch"
+
+  if [ -e setup.ini ]
+  then
+    return 0
+  else
+    get-setup
+    return 1
+  fi
+}
+
+function get-setup {
+  wget -N $mirror/$arch/setup.xz $mirror/$arch/setup.xz.sig
+  if [ -e setup.xz ]
+  then
+    if ! gpg --status-fd=1 --verify setup.xz.sig setup.xz | grep -q "^\\[GNUPG:\\] VALIDSIG 56405CF6FCC81574682A5D561A698DE9E2E56300"
+    then
+      echo Error checking setup.ini signature
+      exit 1
+    fi
+    unxz setup.xz
+    mv setup setup.ini
+    echo Updated setup.ini
+  else
+    echo Error fetching setup.ini
+    exit 1
+  fi
+}
+
+function check-packages {
+  if [[ $pks ]]
+  then
+    return 0
+  else
+    echo No packages specified
+    return 1
+  fi
+}
+
+function cpt-download {
+  check-packages
+  find-workspace
+  local pkg sbq
+  for pkg in "${pks[@]}"
+  do
+    (( sbq++ )) && echo
+    download "$pkg"
+  done
+}
+
+function download {
+  local pkg digest digactual
+  pkg=$1
+
+  # look for package and extract section to 'desc'
+  cd "$cache/$mirrordir/$arch"
+  awk '$1 == pc' RS='\n\n@ ' FS='\n' pc=$pkg setup.ini > desc
+  if [ ! -s desc ]
+  then
+    echo Unable to locate package $pkg
+    exit 1
+  fi
+
+  # download the compressed tar file
+
+  # pick the latest version, which comes first
+  set -- $(awk '$1 == "install:"' desc)
+  if (( ! $# ))
+  then
+    echo 'Could not find "install" line in package description'
+    exit 1
+  fi
+
+  dn=$(dirname $2)
+  bn=$(basename $2)
+
+  # check the hash
+  digest=$4
+  case ${#digest} in
+   32) hash=md5sum    ;;
+  128) hash=sha512sum ;;
+  esac
+  mkdir -p "$cache/$mirrordir/$dn"
+  cd "$cache/$mirrordir/$dn"
+  if ! test -e $bn || ! $hash -c <<< "$digest $bn"
+  then
+    wget -O $bn $mirror/$dn/$bn
+    $hash -c <<< "$digest $bn" || exit
+  fi
+
+  # write the filelist
+  tar tf $bn | gzip > ${sysroot}/etc/setup/"$pkg".lst.gz
+  cd ~-
+  mv desc "$cache/$mirrordir/$dn"
+
+  echo $dn $bn >/tmp/dwn
+}
+
+function cpt-install {
+  check-root
+  check-packages
+  find-workspace
+
+  local pkg dn bn sbq
+  for pkg in "${pks[@]}"
+  do
+
+  if grep -q "^$pkg " ${sysroot}/etc/setup/installed.db
+  then
+    echo Package $pkg is already installed, skipping
+    continue
+  fi
+  (( sbq++ )) && echo
+  echo Installing $pkg
+
+  download $pkg
+  read dn bn </tmp/dwn
+  echo Unpacking...
+
+  cd "$cache/$mirrordir/$dn"
+  tar -x -C ${sysroot}/ -f $bn
+
+  # update the package database
+  awk '
+  ins != 1 && pkg < $1 {
+    print pkg, bz, 0
+    ins = 1
+  }
+  1
+  END {
+    if (ins != 1) print pkg, bz, 0
+  }
+  ' pkg="$pkg" bz=$bn ${sysroot}/etc/setup/installed.db > /tmp/awk.$$
+  mv ${sysroot}/etc/setup/installed.db ${sysroot}/etc/setup/installed.db-save
+  mv /tmp/awk.$$ ${sysroot}/etc/setup/installed.db
+
+  # process dependencies?
+  # don't run postinstall scripts?
+
+  done
+}
+
+# not quite the same output as 'cygcheck -f' as package name doesn't include version-release
+function cpt-files {
+  check-packages
+  for pkg in "${pks[@]}"
+  do
+    #echo "file: ${pkg}" >/dev/stderr
+    key=$(echo $pkg | sed s.^${sysroot}..)
+    key=$(echo $key | sed s.^/..)
+    [[ $key ]] || key=$pkg
+    #echo "key: ${key}" >/dev/stderr
+    for manifest in ${sysroot}/etc/setup/*.lst.gz
+    do
+      if gzip -cd $manifest | grep -q "^$key\$"
+      then
+        package=$(sed "
+        s,${sysroot}/etc/setup/,,
+        s,.lst.gz,,
+        " <<< $manifest)
+        echo $package
+      fi
+    done
+  done
+}
+
+function cpt-init {
+  check-root
+
+  mkdir -p ${sysroot}/etc/setup
+
+  echo "usr/bin/cygwin1.dll" >${sysroot}/etc/setup/cygwin.lst
+  gzip ${sysroot}/etc/setup/cygwin.lst
+
+  echo "cygwin cygwin-3.7.0.tar.bz2 1" >${sysroot}/etc/setup/installed.db
+}
+
+# process options
+until [ $# = 0 ]
+do
+  case "$1" in
+    --arch)
+      shift
+      arch=$1
+      shift
+      ;;
+
+    download | install | files | init)
+      command=$1
+      shift
+    ;;
+
+    *)
+      pks+=("$1")
+      shift
+    ;;
+
+  esac
+done
+
+if [[ ! ${arch} ]]
+then
+   echo "--arch is required"
+   exit 1
+fi
+
+arch=${arch/i686/x86}
+
+sysroot="/usr/${arch}-pc-cygwin/sys-root/"
+
+if type -t cpt-$command | grep -q function
+then
+  cpt-$command
+else
+  echo "$0: usage error"
+fi
