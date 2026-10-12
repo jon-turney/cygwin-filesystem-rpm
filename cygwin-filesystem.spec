@@ -10,8 +10,8 @@
 
 Name:           cygwin-filesystem
 Version:        151
-Release:        3%{?dist}
-Summary:        Cygwin cross compiler base filesystem and environment
+Release:        4%{?dist}
+Summary:        Cygwin cross-compiler base filesystem and environment
 
 License:        GPL-2.0-or-later
 URL:            https://copr.fedorainfracloud.org/coprs/yselkowitz/cygwin/
@@ -43,6 +43,7 @@ Source22:       toolchain-cygwin-aarch64.meson
 Source23:       pkgconf-personality-cygwin32
 Source24:       pkgconf-personality-cygwin64
 Source25:       pkgconf-personality-cygwin-aarch64
+Source26:       cygwin-pkg-tool
 
 # Taken from the Fedora filesystem package
 Source101:      https://fedorahosted.org/filesystem/browser/lang-exceptions
@@ -71,6 +72,9 @@ Requires:       redhat-rpm-config
 # For using pkgconf with Cygwin
 Requires:       pkgconf
 %endif
+# For cygwin-pkg-tool
+Requires:       gpg
+Requires:       wget
 
 %description base
 This package contains the base filesystem layout, RPM macros and
@@ -302,6 +306,15 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/x86_64-pc-cygwin-pkg-con
 echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/aarch64-pc-cygwin-pkg-config.1
 %endif
 
+install -m 0755 %{SOURCE26} %{buildroot}%{_bindir}/cygwin-pkg-tool
+
+%post
+for i in x86 x86_64 aarch64
+do
+    cygwin-pkg-tool --arch $i init
+done
+
+gpg --recv-key 56405CF6FCC81574682A5D561A698DE9E2E56300
 
 %files base
 %doc COPYING
@@ -313,6 +326,7 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/aarch64-pc-cygwin-pkg-co
 %dir %{_datadir}/cygwin/
 %dir %{_datadir}/meson/
 %dir %{_datadir}/meson/cross/
+%{_bindir}/cygwin-pkg-tool
 
 %files -n cygwin32-filesystem
 %{macrosdir}/macros.cygwin32
@@ -384,6 +398,9 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/aarch64-pc-cygwin-pkg-co
 
 
 %changelog
+* Mon Oct 12 2026 Jon Turney <jon.turney@dronecode.org.uk> 151-4
+- Add a simple tool for installing cygwin packages into sysroot
+
 * Sun Sep 27 2026 Jon Turney <jon.turney@dronecode.org.uk> 151-3
 - Fix cygwin-aarch64 debug package creation
 
