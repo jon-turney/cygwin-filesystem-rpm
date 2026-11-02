@@ -209,15 +209,37 @@ function cpt-files {
   done
 }
 
+# write fake manifests for files which show up in dependency check and which are
+# provided by cross-packages
+# (might be worthwhile automating this...)
 function cpt-init {
   check-root
 
   mkdir -p ${sysroot}/etc/setup
 
+  # cygwin
   echo "usr/bin/cygwin1.dll" >${sysroot}/etc/setup/cygwin.lst
-  gzip ${sysroot}/etc/setup/cygwin.lst
+  gzip -f ${sysroot}/etc/setup/cygwin.lst
 
-  echo "cygwin cygwin-3.7.0.tar.bz2 1" >${sysroot}/etc/setup/installed.db
+  echo "cygwin cygwin-3.7.0.tar.bz2 0" >${sysroot}/etc/setup/installed.db
+
+  # libiconv2
+  echo "usr/bin/cygiconv-2.dll" >${sysroot}/etc/setup/libiconv2.lst
+  gzip -f ${sysroot}/etc/setup/libiconv2.lst
+
+  echo "libiconv2 libiconv2-1.19-2.tar.bz2 0" >>${sysroot}/etc/setup/installed.db
+
+  # gettext
+  echo "usr/bin/cygintl-8.dll" >${sysroot}/etc/setup/libintl8.lst
+  gzip -f ${sysroot}/etc/setup/libintl8.lst
+
+  echo "libintl8 libintl8-0.22.5-1.tar.bz2 0" >>${sysroot}/etc/setup/installed.db
+
+  # gcc
+  echo "usr/bin/cyggcc_s-seh-1.dll" >${sysroot}/etc/setup/libgcc1.lst
+  gzip -f ${sysroot}/etc/setup/libgcc1.lst
+
+  echo "libgcc1 libgcc1-14.4.0-1.tar.bz2 0" >>${sysroot}/etc/setup/installed.db
 }
 
 # process options
