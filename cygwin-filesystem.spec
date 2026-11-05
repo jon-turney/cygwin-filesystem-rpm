@@ -10,7 +10,7 @@
 
 Name:           cygwin-filesystem
 Version:        151
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Cygwin cross-compiler base filesystem and environment
 
 License:        GPL-2.0-or-later
@@ -308,7 +308,7 @@ echo ".so man1/pkgconf.1" > %{buildroot}%{_mandir}/man1/aarch64-pc-cygwin-pkg-co
 
 install -m 0755 %{SOURCE26} %{buildroot}%{_bindir}/cygwin-pkg-tool
 
-%post
+%post base
 for i in x86 x86_64 aarch64
 do
     cygwin-pkg-tool --arch $i init
@@ -398,6 +398,9 @@ gpg --recv-key 56405CF6FCC81574682A5D561A698DE9E2E56300
 
 
 %changelog
+* Thu Nov 15 2026 Jon Turney <jon.turney@dronecode.org.uk> 151-5
+- Fix %post section
+
 * Mon Oct 12 2026 Jon Turney <jon.turney@dronecode.org.uk> 151-4
 - Add a simple tool for installing cygwin packages into sysroot
 
