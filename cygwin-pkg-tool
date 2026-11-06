@@ -87,10 +87,9 @@ function check-packages {
 function cpt-download {
   check-packages
   find-workspace
-  local pkg sbq
+  local pkg
   for pkg in "${pks[@]}"
   do
-    (( sbq++ )) && echo
     download "$pkg"
   done
 }
@@ -105,7 +104,7 @@ function download {
   if [ ! -s desc ]
   then
     echo Unable to locate package $pkg
-    exit 1
+    return 1
   fi
 
   # download the compressed tar file
@@ -115,7 +114,7 @@ function download {
   if (( ! $# ))
   then
     echo 'Could not find "install" line in package description'
-    exit 1
+    return 1
   fi
 
   dn=$(dirname $2)
@@ -132,7 +131,7 @@ function download {
   if ! test -e $bn || ! $hash -c <<< "$digest $bn"
   then
     wget -O $bn $mirror/$dn/$bn
-    $hash -c <<< "$digest $bn" || exit
+    $hash -c <<< "$digest $bn" || return 1
   fi
 
   # write the filelist
@@ -141,6 +140,7 @@ function download {
   mv desc "$cache/$mirrordir/$dn"
 
   echo $dn $bn >/tmp/dwn
+  return 0
 }
 
 function cpt-install {
@@ -148,7 +148,7 @@ function cpt-install {
   check-packages
   find-workspace
 
-  local pkg dn bn sbq
+  local pkg dn bn
   for pkg in "${pks[@]}"
   do
 
@@ -157,10 +157,13 @@ function cpt-install {
     echo Package $pkg is already installed, skipping
     continue
   fi
-  (( sbq++ )) && echo
+
   echo Installing $pkg
 
-  download $pkg
+  if ! download $pkg
+  then
+    continue
+  fi
   read dn bn </tmp/dwn
   echo Unpacking...
 
